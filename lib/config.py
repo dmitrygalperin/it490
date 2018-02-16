@@ -1,7 +1,7 @@
 class Database(object):
     username     = 'dg94'
     password     = 'it490'
-    host         = '192.168.56.110'
+    host         = '192.168.2.110'
     db_type      = 'mysql'
     db_name      = 'walcart'
     queue        = 'db'
@@ -16,7 +16,7 @@ class Backend(object):
 class RabbitMQ(object):
     username     = 'super'
     password     = 'super'
-    host         = '192.168.56.102'
+    host         = '192.168.2.102'
     port         = 5672
     virtual_host = '/'
     exchange     = ''

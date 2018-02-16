@@ -7,7 +7,7 @@ from config import Database
 from models import User, Comment
 import logging
 
-logging.basicConfig(filename='/var/log/dbcon.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/it490/dbcon.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 USERNAME = Database.username
 PASSWORD = Database.password

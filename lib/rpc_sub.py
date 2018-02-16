@@ -8,7 +8,7 @@ import logging
 import json
 from json import JSONDecodeError
 
-logging.basicConfig(filename='../logs/rpc_sub.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/rpc_sub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 class RpcSub(object):

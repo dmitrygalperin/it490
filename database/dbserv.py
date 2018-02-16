@@ -8,7 +8,7 @@ from config import RabbitMQ, Database
 from dbcon import Dbcon
 import logging
 
-logging.basicConfig(filename='../logs/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 #CRUD operation types
 CREATE = 'create'

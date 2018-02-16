@@ -8,7 +8,7 @@ import uuid
 import json
 import logging
 
-logging.basicConfig(filename='../logs/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 class RpcPub(object):
 

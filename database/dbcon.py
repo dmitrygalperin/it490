@@ -32,10 +32,10 @@ class Dbcon(object):
     logger.addHandler(logging.StreamHandler())
 
     @classmethod
-    def get_engine(cls):
+    def get_engine(cls, host=HOST):
         try:
-            cls.logger.info('Connecting to database at {}://{}:****@{}/{}'.format(DB_TYPE, USERNAME, PASSWORD, HOST, DB_NAME))
-            engine = create_engine('{}://{}:{}@{}/{}'.format(DB_TYPE, USERNAME, PASSWORD, HOST, DB_NAME))
+            cls.logger.info('Connecting to database at {}://{}:****@{}/{}'.format(DB_TYPE, USERNAME, PASSWORD, host, DB_NAME))
+            engine = create_engine('{}+pymysql://{}:{}@{}/{}'.format(DB_TYPE, USERNAME, PASSWORD, host, DB_NAME))
             engine.connect()
             cls.logger.info('Database connection successful')
             return engine

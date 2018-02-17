@@ -1,5 +1,5 @@
 class Database(object):
-    username     = 'dg94'
+    username     = 'walcart'
     password     = 'it490'
     host         = '192.168.2.110'
     db_type      = 'mysql'

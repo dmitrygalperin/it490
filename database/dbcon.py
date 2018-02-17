@@ -4,7 +4,7 @@ sys.path.insert(0, "../lib")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from config import Database
-from models import User, Comment
+from models import User, Product, Tracked, Price
 import logging
 
 logging.basicConfig(filename='/var/log/it490/dbcon.log',level=logging.INFO, format='%(asctime)s %(message)s')
@@ -18,7 +18,9 @@ DB_NAME  = Database.db_name
 #Register SQLAlchemy resources here
 RESOURCES = {
     'user': User,
-    'comment': Comment
+    'product': Product,
+    'price': Price,
+    'tracked': Tracked
 }
 
 

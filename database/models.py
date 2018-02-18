@@ -5,8 +5,16 @@ import datetime
 
 Base = declarative_base()
 
+class WalCommon():
+    def __getitem__(self, key):
+        return getattr(self, key)
 
-class Tracked(Base):
+    def __setitem__(self, key, value):
+        getattr(self, key)
+        return setattr(self, key, value)
+
+
+class Tracked(Base, WalCommon):
     __tablename__ = 'tracked'
     user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
@@ -18,7 +26,7 @@ class Tracked(Base):
     #product = relationship("Product", backref="user_tracked_items")
 
 
-class User(Base):
+class User(Base, WalCommon):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String(20), nullable=False)
@@ -35,15 +43,8 @@ class User(Base):
     def __repr__(self):
         return "<User(name={})>".format(self.username)
 
-    def __getitem__(self, key):
-        return getattr(self, key)
 
-    def __setitem__(self, key, value):
-        getattr(self, key)
-        return setattr(self, key, value)
-
-
-class Product(Base):
+class Product(Base, WalCommon):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
     upc = Column(Integer, nullable=False)
@@ -63,7 +64,7 @@ class Product(Base):
     #users = relationship("User", secondary="tracked_items")
 
 
-class Price(Base):
+class Price(Base, WalCommon):
     __tablename__ = 'prices'
     id = Column(Integer, primary_key=True)
     product_id = Column(Integer, ForeignKey('products.id'))

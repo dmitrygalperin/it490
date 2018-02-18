@@ -6,6 +6,7 @@ import pika
 from rpc_sub import RpcSub
 from config import RabbitMQ, Database
 from dbcon import Dbcon
+from common import stringify, objectify
 import logging
 
 logging.basicConfig(filename='/var/log/it490/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
@@ -16,6 +17,9 @@ READ   = 'read'
 UPDATE = 'update'
 DELETE = 'delete'
 
+#SQLAlchemy operation types
+GET = 'get'
+SAVE = 'save'
 
 class DbServ(object):
 
@@ -47,7 +51,7 @@ class DbServ(object):
             req_method = request.get('method').lower()
             req_resource = request.get('resource').lower()
             vald = request.get('values')
-            where_list = request.get('where')
+            where_clause = request.get('where')
             order_by = request.get('orderBy')
             Resource = Dbcon.get_resource(req_resource)
 
@@ -55,19 +59,23 @@ class DbServ(object):
                 return {'message': "The specified resource <{}> doesn't exist".format(req_resource)}
             tbl = Resource.__table__
 
-            if req_method == CREATE:
+            if req_method is CREATE:
                 stmt = tbl.insert()
-            elif req_method == READ:
+            elif req_method is READ:
                 stmt = tbl.select()
-            elif req_method == UPDATE:
+            elif req_method is UPDATE:
                 stmt = tbl.update()
-            elif req_method == DELETE:
+            elif req_method is DELETE:
                 stmt = tbl.delete()
+            elif req_method is GET:
+                return self.get(Resource, where_clause)
+            elif req_method is SAVE:
+                return self.save(req_resource)
             else:
-                return {'message': "Invalid request type. Valid types are create, read, update, delete. e.g {method: 'create'}"}
+                return {'message': "Invalid request type. Valid types are create, read, update, delete, get, save. e.g {method: 'create'}"}
 
-            if where_list:
-                stmt = self.set_where(where_list, stmt, tbl)
+            if where_clause:
+                stmt = self.set_where(where_clause, stmt, tbl)
             if vald:
                 stmt = stmt.values(**vald)
             if order_by:
@@ -116,6 +124,24 @@ class DbServ(object):
         order_func = col.desc() if direction == 'desc' else col.asc()
         return stmt.order_by(order_func)
 
+    def get(self, resource, where_clause):
+        response = []
+        result = self.session.query(resource).filter_by(**where_clause)
+        for item in result:
+            response.append(item)
+        if len(response) is 1:
+            response = response[0]
+        return {'result': stringify(response)}
+
+    def save(self, resource):
+        self.session.add(objectify(resource))
+        try:
+            self.session.commit()
+            return {'success': True}
+        except Exception as e:
+            self.logger.info(e)
+            self.session.rollback()
+            return {'message': str(e)}
 
 if __name__ == '__main__':
     dbserv = DbServ()

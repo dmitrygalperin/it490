@@ -49,27 +49,27 @@ class DbServ(object):
     def fill_request(self, request):
         try:
             req_method = request.get('method').lower()
-            req_resource = request.get('resource').lower()
+            req_resource = request.get('resource')
             vald = request.get('values')
             where_clause = request.get('where')
             order_by = request.get('orderBy')
-            Resource = Dbcon.get_resource(req_resource)
+            if req_method != SAVE:
+                Resource = Dbcon.get_resource(req_resource.lower())
+                if not Resource:
+                    return {'message': "The specified resource <{}> doesn't exist".format(req_resource)}
+                tbl = Resource.__table__
 
-            if not Resource:
-                return {'message': "The specified resource <{}> doesn't exist".format(req_resource)}
-            tbl = Resource.__table__
-
-            if req_method is CREATE:
+            if req_method == CREATE:
                 stmt = tbl.insert()
-            elif req_method is READ:
+            elif req_method == READ:
                 stmt = tbl.select()
-            elif req_method is UPDATE:
+            elif req_method == UPDATE:
                 stmt = tbl.update()
-            elif req_method is DELETE:
+            elif req_method == DELETE:
                 stmt = tbl.delete()
-            elif req_method is GET:
+            elif req_method == GET:
                 return self.get(Resource, where_clause)
-            elif req_method is SAVE:
+            elif req_method == SAVE:
                 return self.save(req_resource)
             else:
                 return {'message': "Invalid request type. Valid types are create, read, update, delete, get, save. e.g {method: 'create'}"}

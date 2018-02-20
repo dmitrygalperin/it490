@@ -32,7 +32,7 @@ class RpcPub(object):
         self.queue         = queue
 
         self.connection = self.get_connection()
-        if not connection:
+        if not self.connection:
             return self.logger.critical("Connection error...")
         self.channel = self.connection.channel()
 

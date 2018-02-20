@@ -6,7 +6,7 @@ import pika
 from rpc_sub import RpcSub
 from config import RabbitMQ, Database
 from dbcon import Dbcon
-from common import stringify, objectify
+from common import serialize, unserialize
 import logging
 
 logging.basicConfig(filename='/var/log/it490/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
@@ -131,10 +131,10 @@ class DbServ(object):
             response.append(item)
         if len(response) is 1:
             response = response[0]
-        return {'result': stringify(response)}
+        return {'result': serialize(response)}
 
     def save(self, resource):
-        self.session.add(objectify(resource))
+        self.session.add(unserialize(resource))
         try:
             self.session.commit()
             return {'success': True}
@@ -147,6 +147,5 @@ if __name__ == '__main__':
     dbserv = DbServ()
     if not dbserv.session:
         sys.exit()
-
     rpc_sub = RpcSub(Database.queue, dbserv.fill_request)
     rpc_sub.listen()

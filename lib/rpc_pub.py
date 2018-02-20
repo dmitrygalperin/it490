@@ -7,6 +7,8 @@ from config import RabbitMQ
 import uuid
 import json
 import logging
+import threading
+import time
 
 logging.basicConfig(filename='/var/log/it490/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -17,6 +19,10 @@ class RpcPub(object):
     '''
 
     def __init__(self, queue):
+        self.logger = logging.getLogger('rpc_pub')
+        self.logger.addHandler(logging.StreamHandler())
+        self.heartbeat_interval = 30
+
         self.username      = RabbitMQ.username
         self.password      = RabbitMQ.password
         self.host          = RabbitMQ.host
@@ -26,31 +32,29 @@ class RpcPub(object):
         self.queue         = queue
 
         self.connection = self.get_connection()
+        if not connection:
+            return self.logger.critical("Connection error...")
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
 
-        self.logger = logging.getLogger('rpc_pub')
-        self.logger.addHandler(logging.StreamHandler())
+        threading.Thread(target=self.keep_alive).start()
 
         self.channel.basic_consume(self.on_response, no_ack=True, queue = self.callback_queue)
 
     def get_connection(self):
-        try:
-            credentials = pika.PlainCredentials(self.username, self.password)
-            return pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port, self.virtual_host, credentials))
-        except Exception as e:
-            self.logger.critical(e)
+        credentials = pika.PlainCredentials(self.username, self.password)
+        return pika.BlockingConnection(pika.ConnectionParameters(self.host, self.port, self.virtual_host, credentials))
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
             self.response = json.loads(body.decode('utf-8'))
 
     def keep_alive(self):
-        if self.connection.is_closed:
-            self.connection = self.get_connection()
-            self.channel = self.connection.channel()
+        while self.connection:
+            self.connection.process_data_events()
+            time.sleep(self.heartbeat_interval)
 
     def call(self, data_dict):
         data_json = json.dumps(data_dict)

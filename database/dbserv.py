@@ -131,6 +131,7 @@ class DbServ(object):
             response.append(item)
         if len(response) is 1:
             response = response[0]
+        self.logger.info(response)
         return {'result': serialize(response)}
 
     def save(self, resource):

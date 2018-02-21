@@ -21,16 +21,14 @@ class BackendServ(object):
 	
 
 	def fill_request(self, request):
-		request_method = request["method"]
-		func = self.METHODS[request_method]
-		return func(request["data"])
+		request_method = request.get("method", None)
+		if request_method:
+			func = self.METHODS[request_method]
+			return func(request["data"])
+		return {'success': False, 'message': 'Invalid request'}
 
 	def register(self, user):
-		newUser = User(
-			username=user['username'],
-			password=user['password'],
-			email=user['email']
-		)
+		newUser = User(**user)
 		res = self.pub.call({'method': 'save', 'resource': serialize(newUser)})
 		if res['success']:
 			return {'success': True, 'message': 'User has been register successfully!' }
@@ -38,7 +36,11 @@ class BackendServ(object):
 			return res
 
 	def login(self, user):
-		pass
+		res = self.pub.call({'method': 'get', 'resource': 'user', 'where': user})
+		user = unserialize(res['result'])
+		if user:
+			return {'hash': user.password}
+		return {'success': False, 'message': 'Invalid username'}
 
 		
 

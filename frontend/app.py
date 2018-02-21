@@ -1,6 +1,5 @@
 import sys
 sys.path.append("../lib")
-import pika
 from rpc_pub import RpcPub
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
 from data import Articles
@@ -27,8 +26,8 @@ def products():
     
     #request list of products from Rabit MQ
     
-    result = pub.call({'products': 234})
-    print(result)
+    result = "Test Product"
+    
     #if result>0:
     #    return render_template('products.html', articles=articles)
     #else:
@@ -81,31 +80,26 @@ def login():
         username = request.form['username']
         password_candidate = request.form['password']
         app.logger.info(username)
-        #Create cursor
-        cur = mysql.connection.cursor()
-        #Get user 
-        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
 
-        if result > 0:
-            #get stored hasj
-            data = cur.fetchone()
-            password = data['password']
-            #compare passworda
-            if sha256_crypt.verify(password_candidate, password):
-                #passes
+        data = {"method": "login", "data":{"username":username}} 
+        response = pub.call(data)  
+        
+        if response['hash']:
+            if sha256_crypt.verify(password_candidate, response['hash']):
+
                 session['logged_in'] = True
                 session['username'] = username
 
                 flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                error = 'Invalid login'
+                error = response['message']
                 return render_template('login.html', error=error)    
-            #close connection
-            cur.close()    
         else:
-            error = 'User not Found'
-            return render_template('login.html', error=error)
+            error = response['message']
+            return render_template('login.html', error=error)    
+               
+       
             
             
     return render_template('login.html')
@@ -136,17 +130,16 @@ def logout():
 @is_logged_in
 def dashboard():
 
-    cur = mysql.connection.cursor()
+    msg = 'No Articles Found'
+    return render_template('dashboard.html', msg=msg)
 
-    result = cur.execute("SELECT * FROM articles")
 
-    articles = cur.fetchall()
 
-    if result>0:
-        return render_template('dashboard.html', articles=articles)
-    else:
-        msg = 'No Articles Found'
-        return render_template('dashboard.html', msg=msg)
+    #if result>0:
+    #    return render_template('dashboard.html', articles=articles)
+    #else:
+    #    msg = 'No Articles Found'
+    #    return render_template('dashboard.html', msg=msg)
     cur.close()
 
 #Article from class

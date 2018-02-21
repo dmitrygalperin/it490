@@ -20,24 +20,24 @@ class BackendServ(object):
 		}
 	
 
-	def fill_request(request):
+	def fill_request(self, request):
 		request_method = request["method"]
 		func = self.METHODS[request_method]
 		return func(request["data"])
 
-	def register(user):
+	def register(self, user):
 		newUser = User(
 			username=user['username'],
 			password=user['password'],
 			email=user['email']
 		)
-		res = self.pub.call({'save': serialize(newUser)})
+		res = self.pub.call({'method': 'save', 'resource': serialize(newUser)})
 		if res['success']:
 			return {'success': True, 'message': 'User has been register successfully!' }
 		else:
 			return res
 
-	def login(user):
+	def login(self, user):
 		pass
 
 		

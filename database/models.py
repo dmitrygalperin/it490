@@ -29,7 +29,7 @@ class Tracked(Base, WalCommon):
 class User(Base, WalCommon):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    username = Column(String(20), nullable=False)
+    username = Column(String(20), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     email = Column(String(80), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

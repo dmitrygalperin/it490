@@ -23,4 +23,7 @@ class Walcart(object):
 
     @classmethod
     def get_json(cls, url):
-        return json.loads(urlopen(url).read())
+        try:
+            return json.loads(urlopen(url).read())
+        except:
+            return {'message': 'Product not found'}

@@ -1,4 +1,5 @@
 import sys
+import re
 sys.path.append("../lib")
 from rpc_pub import RpcPub
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
@@ -13,9 +14,30 @@ app = Flask(__name__)
 pub = RpcPub(Backend.queue)
 
 
-@app.route('/')
+class SearchProductForm(Form):
+    product = StringField('Product', [validators.Length(min=4)])
+
+@app.route('/', methods=['GET','POST'])
 def index():
-    return render_template('home.html')
+
+    form = SearchProductForm(request.form)
+    if request.method == 'POST' and form.validate():
+        productUrl= form.product.data
+        productid = re.findall(r"[\/][0-9]{6,9}", productUrl)
+        if not productid:
+            flash('wthj', 'error')
+            return render_template('home.html', form=form)
+
+        data = {"method":"search", "data":{"productUrl":productid[0][1:]}}
+
+        response = pub.call(data)
+        if response['success']:
+            flash(response, 'success')
+            return render_template('home.html', product=response)
+        else:
+            flash('wth', 'success')
+            return render_template('home.html')
+    return render_template('home.html', form=form)
 
 @app.route('/about')
 def about():
@@ -35,13 +57,20 @@ def products():
     return render_template('products.html', msg=result)
     
 
-@app.route('/product/<string:id>')
-def product(id):
+#@app.route('/product/<string:id>')
+@app.route('/product')
+def product(product):
     
-    result = pub.call({'productID':id})
+    #result = pub.call({'productID':id})
     
     return render_template('product.html', product=product)
 
+
+
+@app.route('/searchProduct', methods=['GET', 'POST'])
+def searchProduct():
+    return render_template('product.html', form=form)
+    
 #Register from class
 class RegisterForm(Form):
     #name = StringField('Name', [validators.Length(min=1, max=50)])

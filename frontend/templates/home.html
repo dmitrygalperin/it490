@@ -3,9 +3,21 @@
 {% block body %}
 
     <div class="jumbotron text-center">
-        <h1>Welcome to Flask</h1>
-        <p class="lead">This is a test app</p>
+        <h1>Welcome to Wall-Cart</h1>
+        <p class="lead">Enter a product URL to compare prices or see a trend</p>
+
+        {% from "includes/_formhelpers.html" import render_field %}
+        
+        <form method="POST" action="">
+            <div class="form-group">
+                {{render_field(form.product, class_="form-control")}}
+            </div>
+            <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+        </form>
+        
+        
         {% if session.logged_in ==NULL %}
+        <p class="lead">Log in or Regiter to see your saved Items</p>
             <a href="/register" class="btn btn-primary btn-lg">Register</a>
             <a href="/login" class="btn btn-success btn-lg">Login</a>
         {% endif %}

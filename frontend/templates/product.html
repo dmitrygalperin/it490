@@ -2,9 +2,9 @@
 
 {% block body %}
     <h1>{{product.title}}</h1>
-    <small>Written by {{product.author}} on {{product.create_date}}</small>
+    <small>{{product.name}}</small>
     <hr>
     <div>
-        {{product.body | safe}}
+        
     </div>
 {% endblock %}

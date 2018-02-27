@@ -12,7 +12,15 @@ class Walcart(object):
     postbrowse_url = Api.postbrowse_url
 
     @classmethod
-    def get_item(cls, item_id):
-        url = '{}{}/{}?apiKey={}&format=json'.format(cls.base_url, cls.items_url, item_id, cls.key)
-        res = urlopen(url)
-        return json.loads(res.read())
+    def product(cls, product_id):
+        url = '{}{}/{}?apiKey={}&format=json'.format(cls.base_url, cls.items_url, product_id, cls.key)
+        return cls.get_json(url)
+
+    @classmethod
+    def nbp(cls, product_id):
+        url = '{}{}?apiKey={}&itemId={}'.format(cls.base_url, cls.nbp_url, cls.key, product_id)
+        return cls.get_json(url)
+
+    @classmethod
+    def get_json(cls, url):
+        return json.loads(urlopen(url).read())

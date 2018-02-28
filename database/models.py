@@ -18,7 +18,7 @@ class WalCommon():
         return setattr(self, key, value)
 
     def to_dict(self):
-        d = self.__dict__
+        d = self.__dict__.copy()
         d.pop('_sa_instance_state')
         return d
 
@@ -52,12 +52,11 @@ class User(Base, WalCommon):
     #products = relationship('Product', secondary='tracked_items')
 
     def to_dict(self):
-        d = self.__dict__
+        d = self.__dict__.copy()
         d.pop('_sa_instance_state')
-        products = d.get('products')
         d['created_at'] = str(d['created_at'])
-        if products:
-            d['products'] = [product.to_dict() for product in products]
+        if self.products:
+            d['products'] = [product.to_dict() for product in self.products]
         return d
 
     def __repr__(self):
@@ -84,14 +83,12 @@ class Product(Base, WalCommon):
     #users = relationship("User", secondary="tracked_items")
 
     def to_dict(self):
-        d = self.__dict__
+        d = self.__dict__.copy()
         d.pop('_sa_instance_state')
-        #if d.get('users'):
-        #    d.pop('users')
+        if d.get('users'):
+            d.pop('users')
         d['created_at'] = str(d['created_at'])
-        prices = d.get('prices')
-        if prices:
-            d['prices'] = [price.to_dict() for price in prices]
+        d['prices'] = [price.to_dict() for price in self.prices]
         return d
 
     def __repr__(self):

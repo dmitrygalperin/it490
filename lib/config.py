@@ -1,7 +1,8 @@
 class Database(object):
     username     = 'walcart'
     password     = 'it490'
-    host         = '192.168.2.110'
+    #host         = '192.168.2.110'
+    host         = '192.168.56.3'
     db_type      = 'mysql'
     db_name      = 'walcart'
     queue        = 'db'

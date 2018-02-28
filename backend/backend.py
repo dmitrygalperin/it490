@@ -65,11 +65,11 @@ class BackendServ(object):
 			)
 			price = product_data.get('salePrice')
 			if price:
-				product.prices.append(Price(price=price, product_id=product.id, stock=product_data.get('stock')))
+				product.prices.append(Price(price=price, stock=product_data.get('stock')))
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
-			if not res['success']:
+			if not res.get('success'):
 				return res
-			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
+			#res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
 			return {'product': unserialize(res['result']).to_dict()}
 		return {'product': product.to_dict()}
 

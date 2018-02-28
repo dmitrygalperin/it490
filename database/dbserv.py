@@ -139,7 +139,7 @@ class DbServ(object):
         self.session.add(r_obj)
         try:
             self.session.commit()
-            return {'success': True, 'resource': serialize(r_obj)}
+            return {'success': True }
         except Exception as e:
             self.logger.info(e)
             self.session.rollback()

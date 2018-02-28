@@ -35,7 +35,7 @@ class Tracked(Base, WalCommon):
     #product = relationship("Product", backref="user_tracked_items")
 
     def to_dict(self):
-        return {'tracked_since': self.created_at,
+        return {'tracked_since': str(self.created_at),
                 'wishlist': self.wishlist,
                 'product': self.product.to_dict()}
 
@@ -55,6 +55,7 @@ class User(Base, WalCommon):
         d = self.__dict__
         d.pop('_sa_instance_state')
         products = d.get('products')
+        d['created_at'] = str(d['created_at'])
         if products:
             d['products'] = [product.to_dict() for product in products]
         return d
@@ -85,8 +86,9 @@ class Product(Base, WalCommon):
     def to_dict(self):
         d = self.__dict__
         d.pop('_sa_instance_state')
-        if(d.get('users')):
-            d.pop('users')
+        #if d.get('users'):
+        #    d.pop('users')
+        d['created_at'] = str(d['created_at'])
         prices = d.get('prices')
         if prices:
             d['prices'] = [price.to_dict() for price in prices]
@@ -109,7 +111,7 @@ class Price(Base, WalCommon):
     def to_dict(self):
         return {'price': self.price,
                 'stock': self.stock,
-                'created_at': self.created_at}
+                'created_at': str(self.created_at)}
 
     def __repr__(self):
         return "<Price(product_id={}, price={})>".format(self.product_id, self.price)

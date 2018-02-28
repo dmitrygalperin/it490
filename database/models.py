@@ -85,7 +85,8 @@ class Product(Base, WalCommon):
     def to_dict(self):
         d = self.__dict__
         d.pop('_sa_instance_state')
-        d.pop('users')
+        if(d.get('users')):
+            d.pop('users')
         prices = d.get('prices')
         if prices:
             d['prices'] = [price.to_dict() for price in prices]

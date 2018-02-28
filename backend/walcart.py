@@ -24,6 +24,8 @@ class Walcart(object):
     @classmethod
     def get_json(cls, url):
         try:
-            return json.loads(urlopen(url).read())
-        except:
+            print(url)
+            return json.loads(urlopen(url).read().decode('utf-8'))
+        except Exception as e:
+            print(str(e))
             return {'message': 'Product not found'}

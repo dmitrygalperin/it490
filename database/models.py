@@ -66,16 +66,16 @@ class User(Base, WalCommon):
 class Product(Base, WalCommon):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
-    upc = Column(Integer, nullable=False)
+    upc = Column(String(200), nullable=False)
     name = Column(String(200), nullable=False)
-    thumbnail_img = Column(String(200))
-    med_img = Column(String(200))
-    lg_img = Column(String(200))
-    short_descr = Column(String(500))
-    long_descr = Column(String(500))
+    thumbnail_img = Column(String(2000))
+    med_img = Column(String(2000))
+    lg_img = Column(String(2000))
+    short_descr = Column(String(10000))
+    long_descr = Column(String(10000))
     msrp = Column(Float)
-    add_to_cart_url = Column(String(200))
-    url = Column(String(200))
+    add_to_cart_url = Column(String(2000))
+    url = Column(String(2000))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     users = relationship("Tracked", back_populates="product")
@@ -100,14 +100,14 @@ class Price(Base, WalCommon):
     id = Column(Integer, primary_key=True)
     product_id = Column(Integer, ForeignKey('products.id'))
     price = Column(Float)
-    available = Column(Boolean, nullable=False)
+    stock = Column(String(100))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     products = relationship("Product", back_populates="prices")
 
     def to_dict(self):
         return {'price': self.price,
-                'available': self.available,
+                'stock': self.stock,
                 'created_at': self.created_at}
 
     def __repr__(self):

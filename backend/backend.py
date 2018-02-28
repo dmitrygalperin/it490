@@ -43,13 +43,10 @@ class BackendServ(object):
 		return {'success': False, 'message': 'Invalid username'}
 
 	def search(self, product_id):
-		try:
-			product_id = int(product_id)
-		except:
-			return {'message': 'Invalid product ID'}
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_id}})
 		product = unserialize(res['result'])
 		if not product:
+			print(product_id)
 			product_data = Walcart.product(product_id)
 			if product_data.get('message'):
 				return product_data
@@ -68,7 +65,7 @@ class BackendServ(object):
 			)
 			price = product_data.get('salePrice')
 			if price:
-				product.prices.append(Price(price=price, product_id=product.id))
+				product.prices.append(Price(price=price, product_id=product.id, stock=product_data.get('stock')))
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
 			if not res['success']:
 				return res

@@ -1,7 +1,7 @@
 import	sys
 sys.path.insert(0, "../lib")
 sys.path.insert(0, "../database")
-from models import User, Product, Price
+from models import User, Product, Price, Tracked
 from rpc_sub import RpcSub
 from rpc_pub import RpcPub
 from walcart import Walcart
@@ -69,7 +69,9 @@ class BackendServ(object):
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
 			if not res['success']:
 				return res
-		return {'product': res['resource'].to_dict()}
+			print(res)
+			return {'product': unserialize(res['resource']).to_dict()}
+		return {'product': product.to_dict()}
 
 if __name__ == '__main__':
 	backend = BackendServ()

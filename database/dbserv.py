@@ -135,10 +135,11 @@ class DbServ(object):
         return {'result': serialize(response)}
 
     def save(self, resource):
-        self.session.add(unserialize(resource))
+        r_obj = unserialize(resource)
+        self.session.add(r_obj)
         try:
             self.session.commit()
-            return {'success': True, 'resource': serialize(resource)}
+            return {'success': True 'resource': serialize(r_obj)}
         except Exception as e:
             self.logger.info(e)
             self.session.rollback()

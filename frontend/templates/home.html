@@ -21,6 +21,19 @@
             <a href="/register" class="btn btn-primary btn-lg">Register</a>
             <a href="/login" class="btn btn-success btn-lg">Login</a>
         {% endif %}
+
+        {% if isproduct == True %}
+
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="..." alt="Card image cap">
+                <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">details about the product.</p>
+                <a href="#" class="btn btn-primary">Add to my List</a>
+                </div>
+            </div>
+
+        {% endif %}
     </div>
 
 {% endblock %}

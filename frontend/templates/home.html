@@ -28,14 +28,14 @@
                 <h5 class="card-header">{{ product.name }}</h5>
                 <img class="card-img-top" src="{{ product.med_img }}" alt="Card image cap">
                 <div class="card-body">
-                <h5 class="card-title">$. {{ product.prices.price }}</h5>
+                <h5 class="card-title">$. {{ product.prices[0].price }}</h5>
                 <p class="card-text">{{ product.short_descr }}</p>
                 <form action="/add_product" method="post">
                     <input type="text" value="{{ product.id }}" hidden>
                     <input type="submit" value="Add to my List" class="btn btn-primary">
                 </form>
                 <div class="card-footer text-muted">
-                        {{ product.prices.stock}}
+                        {{ product.prices[0].stock}}
                       </div>
                 </div>
             </div>

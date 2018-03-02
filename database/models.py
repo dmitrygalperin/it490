@@ -87,7 +87,7 @@ class Product(Base, WalCommon):
         d.pop('_sa_instance_state')
         if d.get('users'):
             d.pop('users')
-        d['created_at'] = self.created_at 
+        d['created_at'] = str(self.created_at)
         d['prices'] = [price.to_dict() for price in self.prices]
         return d
 

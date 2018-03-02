@@ -127,6 +127,7 @@ class DbServ(object):
     def get(self, resource, where_clause):
         response = []
         result = self.session.query(resource).filter_by(**where_clause)
+        self.session.expunge_all()
         for item in result:
             response.append(item)
         if len(response) is 1:
@@ -139,6 +140,7 @@ class DbServ(object):
         self.session.add(r_obj)
         try:
             self.session.commit()
+            self.session.expunge_all()
             return {'success': True, 'result': serialize(r_obj)}
         except Exception as e:
             self.logger.info(e)

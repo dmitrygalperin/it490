@@ -54,7 +54,7 @@ class User(Base, WalCommon):
     def to_dict(self):
         d = self.__dict__.copy()
         d.pop('_sa_instance_state')
-        d['created_at'] = str(d['created_at'])
+        #d['created_at'] = str(d['created_at'])
         if self.products:
             d['products'] = [product.to_dict() for product in self.products]
         return d
@@ -87,7 +87,7 @@ class Product(Base, WalCommon):
         d.pop('_sa_instance_state')
         if d.get('users'):
             d.pop('users')
-        d['created_at'] = str(self.created_at)
+        #d['created_at'] = str(self.created_at)
         d['prices'] = [price.to_dict() for price in self.prices]
         return d
 
@@ -108,7 +108,7 @@ class Price(Base, WalCommon):
     def to_dict(self):
         return {'price': self.price,
                 'stock': self.stock,
-                'created_at': str(self.created_at)}
+                #'created_at': str(self.created_at)}
 
     def __repr__(self):
         return "<Price(product_id={}, price={})>".format(self.product_id, self.price)

@@ -29,7 +29,10 @@
                 <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">details about the product.</p>
-                <a href="#" class="btn btn-primary">Add to my List</a>
+                <form action="/add_product" method="post">
+                    <input type="text" value="{{ product.id }}" hidden>
+                    <input type="submit" value="Add to my List" class="btn btn-primary">
+                </form>
                 </div>
             </div>
 

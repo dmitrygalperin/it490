@@ -37,7 +37,7 @@ def index():
 
         data = {"method":"search", "data":productid[0][1:]}
         response = pub.call(data)
-        if response['product']:
+        if response.get('product'):
             #flash(response['product'], 'success')
             #if we get a product, then change variable to true to show the data
             isproduct = True
@@ -45,7 +45,7 @@ def index():
             #using json.loads since the response is supose to be a json
             return render_template('home.html',form=form, product=response['product'], isproduct=isproduct)
         else:
-            flash(response['product'], 'warning')
+            flash(response['message'], 'warning')
             isproduct= False
             return render_template('home.html',form=form, isproduct=isproduct)
     
@@ -135,10 +135,10 @@ def login():
                 flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                error = response['message']
+                error = 'Wrong Credentials'
                 return render_template('login.html', error=error)    
         else:
-            error = response['message']
+            error = 'forgot something?'
             return render_template('login.html', error=error)    
                
        
@@ -172,7 +172,7 @@ def logout():
 @is_logged_in
 def dashboard():
 
-    msg = 'No Articles Found'
+    msg = "you got here"
     return render_template('dashboard.html', msg=msg)
 
 
@@ -190,20 +190,18 @@ class ArticleForm(Form):
     title = StringField('Title', [validators.Length(min=1, max=200)])
     body = StringField('Body', [validators.Length(min=30)])
     
-@app.route('/add_article', methods=['GET', 'POST'])
+@app.route('/add_product', methods=['GET', 'POST'])
 @is_logged_in
 def add_article():
-    form = ArticleForm(request.form)
-    if request.method == 'POST' and form.validate():
-        title =form.title.data
-        body = form.body.data
-
-       
+    
+    if request.method == 'POST':
+        result = request.form
+          
 
         flash('Article create', 'success')
-        return redirect(url_for('dashboard'))
+        return render_template('dashboard.html', result =result)
 
-    return render_template('add_article.html', form=form)    
+    return render_template('add_article.html')    
 
 @app.route('/edit_article/<string:id>', methods=['GET', 'POST'])
 @is_logged_in

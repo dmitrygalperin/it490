@@ -8,9 +8,9 @@ from config import RabbitMQ, Database
 from dbcon import Dbcon
 from common import serialize, unserialize
 import logging
-from sqlalchemy.orm import joinedload_all 
+from sqlalchemy.orm import joinedload_all
 
-logging.basicConfig(filename='/var/log/it490/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/it490/database/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 #CRUD operation types
 CREATE = 'create'
@@ -124,11 +124,10 @@ class DbServ(object):
         col = getattr(tbl.c, colname)
         order_func = col.desc() if direction == 'desc' else col.asc()
         return stmt.order_by(order_func)
- 
+
     def get(self, resource, where_clause):
         response = []
         result = self.session.query(resource).filter_by(**where_clause)
-        self.logger.info(result)
         #self.session.expunge_all()
         for item in result:
             response.append(item)

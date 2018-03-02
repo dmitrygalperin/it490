@@ -5,10 +5,12 @@ from models import User, Product, Price, Tracked
 from rpc_sub import RpcSub
 from rpc_pub import RpcPub
 from walcart import Walcart
+import logging
 
 from config import Backend, Database
 from common import serialize, unserialize
 
+logging.basicConfig(filename='/var/log/it490/backend/backendserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 class BackendServ(object):
 	def __init__(self):
@@ -19,12 +21,15 @@ class BackendServ(object):
 			"login": self.login,
             "search": self.search
 		}
+		self.logger = logging.getLogger('backendserv')
+        self.logger.addHandler(logging.StreamHandler())
 
 	def fill_request(self, request):
 		request_method = request.get("method", None)
 		if request_method:
-			func = self.METHODS[request_method]
+			func = self.METHODS.get(request_method)
 			return func(request["data"])
+		self.logger.info('Invalid request: {}'.format(request_method))
 		return {'success': False, 'message': 'Invalid request'}
 
 	def register(self, user):
@@ -33,6 +38,7 @@ class BackendServ(object):
 		if res['success']:
 			return {'success': True, 'message': 'User has been registered successfully!' }
 		else:
+			self.logger.info(res['message'])
 			return res
 
 	def login(self, user):
@@ -40,6 +46,7 @@ class BackendServ(object):
 		user = unserialize(res['result'])
 		if user:
 			return {'hash': user.password}
+		self.logger.info('Invalid username: {}'.format(user.username))
 		return {'success': False, 'message': 'Invalid username'}
 
 	def search(self, product_id):
@@ -68,6 +75,7 @@ class BackendServ(object):
 				product.prices.append(Price(price=price, stock=product_data.get('stock')))
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
 			if not res.get('success'):
+				self.logger.info(res['message'])
 				return res
 			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
 			return {'product': unserialize(res['result']).to_dict()}

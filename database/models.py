@@ -109,6 +109,6 @@ class Price(Base, WalCommon):
         return {'price': self.price,
                 'stock': self.stock,
                 #'created_at': str(self.created_at)}
-
+                }
     def __repr__(self):
         return "<Price(product_id={}, price={})>".format(self.product_id, self.price)

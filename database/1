@@ -8,7 +8,6 @@ from config import RabbitMQ, Database
 from dbcon import Dbcon
 from common import serialize, unserialize
 import logging
-from sqlalchemy.orm import joinedload_all 
 
 logging.basicConfig(filename='/var/log/it490/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -124,16 +123,14 @@ class DbServ(object):
         col = getattr(tbl.c, colname)
         order_func = col.desc() if direction == 'desc' else col.asc()
         return stmt.order_by(order_func)
- 
+
     def get(self, resource, where_clause):
         response = []
-        result = self.session.query(resource).filter_by(**where_clause)
-        self.logger.info(result)
-        #self.session.expunge_all()
+        result = self.session.query(resource).filter_by(**where_clause).joinedload_all()
+        self.session.expunge_all()
         for item in result:
             response.append(item)
-        self.logger.info(response)
-        if len(response) == 1:
+        if len(response) is 1:
             response = response[0]
         self.logger.info(response)
         return {'result': serialize(response)}
@@ -144,8 +141,8 @@ class DbServ(object):
         try:
             self.session.commit()
             self.session.expunge_all()
-            #r_obj = self.session.query(type(r_obj)).filter_by(id=r_obj.id).options(joinedload_all()).one()
-            return {'success': True}
+            r_obj = self.session.query(type(r_obj)).filter_by(id=r_obj.id).joinedload_all()
+            return {'success': True, 'result': serialize(r_obj)}
         except Exception as e:
             self.logger.info(e)
             self.session.rollback()

@@ -69,7 +69,7 @@ class BackendServ(object):
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
 			if not res.get('success'):
 				return res
-			#res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
+			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
 			return {'product': unserialize(res['result']).to_dict()}
 		return {'product': product.to_dict()}
 

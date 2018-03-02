@@ -54,6 +54,8 @@ class User(Base, WalCommon):
     def to_dict(self):
         d = self.__dict__.copy()
         d.pop('_sa_instance_state')
+        if d.get('created_at'):
+            d.pop('created_at')
         #d['created_at'] = str(d['created_at'])
         if self.products:
             d['products'] = [product.to_dict() for product in self.products]
@@ -85,6 +87,8 @@ class Product(Base, WalCommon):
     def to_dict(self):
         d = self.__dict__.copy()
         d.pop('_sa_instance_state')
+        if d.get('created_at'):
+            d.pop('created_at')
         if d.get('users'):
             d.pop('users')
         #d['created_at'] = str(self.created_at)

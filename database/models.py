@@ -29,8 +29,8 @@ class Tracked(Base, WalCommon):
     product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
     wishlist = Column(Boolean)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    user = relationship("User", back_populates="products")
-    product = relationship("Product", back_populates="users")
+    user = relationship("User", back_populates="products", lazy="joined")
+    product = relationship("Product", back_populates="users", lazy="joined")
     #user = relationship("User", backref="product_tracked_items")
     #product = relationship("Product", backref="user_tracked_items")
 
@@ -48,7 +48,7 @@ class User(Base, WalCommon):
     email = Column(String(80), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    products = relationship("Tracked", back_populates="user")
+    products = relationship("Tracked", back_populates="user", lazy="joined")
     #products = relationship('Product', secondary='tracked_items')
 
     def to_dict(self):
@@ -78,8 +78,8 @@ class Product(Base, WalCommon):
     url = Column(String(2000))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    users = relationship("Tracked", back_populates="product")
-    prices = relationship("Price", back_populates="products")
+    users = relationship("Tracked", back_populates="product", lazy="joined")
+    prices = relationship("Price", back_populates="products", lazy="joined")
     #users = relationship("User", secondary="tracked_items")
 
     def to_dict(self):
@@ -87,7 +87,7 @@ class Product(Base, WalCommon):
         d.pop('_sa_instance_state')
         if d.get('users'):
             d.pop('users')
-        d['created_at'] = str(d['created_at'])
+        d['created_at'] = self.created_at 
         d['prices'] = [price.to_dict() for price in self.prices]
         return d
 
@@ -103,7 +103,7 @@ class Price(Base, WalCommon):
     stock = Column(String(100))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    products = relationship("Product", back_populates="prices")
+    products = relationship("Product", back_populates="prices", lazy="joined")
 
     def to_dict(self):
         return {'price': self.price,

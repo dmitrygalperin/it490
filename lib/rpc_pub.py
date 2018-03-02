@@ -10,7 +10,7 @@ import logging
 import threading
 import time
 
-logging.basicConfig(filename='/var/log/it490/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/var/log/it490/rpc/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 class RpcPub(object):
 

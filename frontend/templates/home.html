@@ -28,16 +28,20 @@
                 <h5 class="card-header">{{ product.name }}</h5>
                 <img class="card-img-top" src="{{ product.med_img }}" alt="Card image cap">
                 <div class="card-body">
+                {% if product.price %}
                 <h5 class="card-title">$. {{ product.prices[0].price }}</h5>
+                {% endif %}
                 <p class="card-text">{{ product.short_descr }}</p>
                 <form action="/add_product" method="post">
                     <input type="text" value="{{ product.id }}" hidden>
                     <input type="submit" value="Add to my List" class="btn btn-primary">
                 </form>
+                {% if product.price %}
                 <div class="card-footer text-muted">
                         {{ product.prices[0].stock}}
                       </div>
                 </div>
+                {% endif %}
             </div>
 
         {% endif %}

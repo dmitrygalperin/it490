@@ -1,6 +1,7 @@
 import sys
 import re
 import json
+import logging
 sys.path.append("../lib")
 from rpc_pub import RpcPub
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
@@ -13,6 +14,9 @@ from config import Backend
 app = Flask(__name__)
 
 pub = RpcPub(Backend.queue)
+logging.basicConfig(filename='/var/log/it490/frontend/frontend.log',level=logging.INFO, format='%(asctime)s %(message)s')
+logger = logging.getLogger('frontend')
+logger.addHandler(logging.StreamHandler())
 
 
 class SearchProductForm(Form):
@@ -45,6 +49,8 @@ def index():
             #using json.loads since the response is supose to be a json
             return render_template('home.html',form=form, product=response['product'], isproduct=isproduct)
         else:
+            #logger send the error message to the log
+            logger.info(response['message'])
             flash(response['message'], 'warning')
             isproduct= False
             return render_template('home.html',form=form, isproduct=isproduct)
@@ -136,6 +142,8 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 error = 'Wrong Credentials'
+                #logger send the error message to the log
+                logger.info(error)
                 return render_template('login.html', error=error)    
         else:
             error = 'forgot something?'

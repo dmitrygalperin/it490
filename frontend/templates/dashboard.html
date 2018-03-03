@@ -8,9 +8,10 @@
     <hr>
 
     
-           
+    <div class="row">       
         {% for track in products %}
-            <div class="card text-center col-lg-3">
+            <div class="col-lg-3">
+            <div class="card text-center">
                 <h5 class="card-header">{{ track.product.name }}</h5>
                 <img class="card-img-top" style="width: 9rem; margin:auto;" src="{{ track.product.med_img }}" alt="Card image cap">
                 <div class="card-body">
@@ -26,7 +27,8 @@
                 </div>
                 {% endif %}
             </div>
+        </div>
         {% endfor %}
-    
+    </div>
 
 {% endblock %}

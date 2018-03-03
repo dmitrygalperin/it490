@@ -81,7 +81,7 @@ class Product(Base, WalCommon):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     users = relationship("Tracked", back_populates="product", lazy="joined")
-    prices = relationship("Price", back_populates="products", lazy="joined")
+    prices = relationship("Price", back_populates="products", lazy="joined", order_by="Price.created_at")
     #users = relationship("User", secondary="tracked_items")
 
     def to_dict(self):

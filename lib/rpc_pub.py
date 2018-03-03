@@ -58,7 +58,13 @@ class RpcPub(object):
 
     def call(self, data_dict):
         data_json = json.dumps(data_dict)
-        print("Requesting {}".format(data_json))
+        data_json_formatted = data_json.copy()
+        for key, value in data_json_formatted.items():
+            try:
+                data_json_formatted[key] = unserialize(value)
+            except:
+                pass
+        print("Requesting {}".format(data_json_formatted))
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(
@@ -73,5 +79,11 @@ class RpcPub(object):
         )
         while self.response is None:
             self.connection.process_data_events()
-        print("Got {}".format(self.response))
+        response_formatted = response.copy()
+        for key, value in response_formatted.items():
+            try:
+                response_formatted[key] = unserialize(value)
+            except:
+                pass
+        print("Got {}".format(self.response_formatted))
         return self.response

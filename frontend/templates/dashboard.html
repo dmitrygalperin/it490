@@ -7,6 +7,7 @@
     <a href="/add_article" class="btn btn-success">Search Products</a>
     <hr>
 
+    
     <table class="table table-striped">
         <tr>
             <th>ID</th>
@@ -16,21 +17,27 @@
             <th></th>
             <th></th>
         </tr>
-        {% for article in articles %}
-            <tr>
-                <td>{{article.id}}</td>
-                <td>{{article.title}}</td>
-                <td>{{article.author}}</td>
-                <td>{{article.create_date}}</td>
-                <td><a href="edit_article/{{article.id}}" class="btn btn-primary pullright">Edit</a></td>
-                <td>
-                    <form action="{{url_for('delete_article', id=article.id)}}" method="post">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="submit" value="Delete" class="btn btn-danger">
-                    </form>
-
-                </td>
-            </tr>
+        
+        {% for product in products %}
+            <div class="card text-center">
+                <h5 class="card-header">{{ product.name }}</h5>
+                <img class="card-img-top" style="width: 18rem; margin:auto;" src="{{ product.med_img }}" alt="Card image cap">
+                <div class="card-body">
+                {% if product.prices %}
+                <h5 class="card-title">Current Price $.{{ product.prices[-1].price }}</h5>
+                {% endif %}
+                <p class="card-text">{{ product.short_descr }}</p>
+                <form action="/add_product" method="post">
+                    <input type="text" value="{{ product.id }}" name="productID" id="productID">
+                    <input type="submit" value="Add to my List" class="btn btn-primary">
+                </form>
+                {% if product.prices %}
+                <div class="card-footer text-muted">
+                        {{ product.prices[-1].stock}}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
         {% endfor %}
     </table>
 

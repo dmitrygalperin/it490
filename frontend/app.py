@@ -4,7 +4,7 @@ import json
 import logging
 sys.path.append("../lib")
 from rpc_pub import RpcPub
-from flask import Flask, render_template, flash, redirect, url_for, session, logging, request, jsonify
+from flask import Flask, render_template, flash, redirect, url_for, session, request, jsonify
 from data import Articles
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
@@ -180,9 +180,16 @@ def logout():
 @is_logged_in
 def dashboard():
 
-    msg = "you got here"
-    return render_template('dashboard.html', msg=msg)
+    user = session['username']
+    data = {"method": "get_user", "data":user}
+    response = pub.call(data)
+    print('anything')
 
+    if response['success']:
+        return render_template('dashboard.html', products=response['user']['products'])
+    
+    return render_template('dashboard.html')
+    
 
 
     #if result>0:
@@ -203,11 +210,17 @@ class ArticleForm(Form):
 def add_article():
     
     if request.method == 'POST':
-        result = request.form
-          
+        user = session['username']
+        result = request.form['productID']
+        data = {"method": "track_product", "data":{"username":user, "product_id": result, "wishlist":False}} 
+        response = pub.call(data)
 
-        flash('Article create', 'success')
-        return render_template('dashboard.html', result =result)
+        if response['success']:
+            flash('Product Added', 'success')
+            return render_template('dashboard.html')
+        else:
+            flash('Product Added', 'warning')
+            return render_template('home.html')
 
     return render_template('add_article.html')    
 
@@ -258,4 +271,4 @@ def delete_article(id):
 
 if __name__ == '__main__':
     app.secret_key='secret123'
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

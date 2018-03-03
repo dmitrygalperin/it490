@@ -9,6 +9,7 @@ import json
 import logging
 import threading
 import time
+from common import unserialize
 
 logging.basicConfig(filename='/var/log/it490/rpc/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -58,7 +59,13 @@ class RpcPub(object):
 
     def call(self, data_dict):
         data_json = json.dumps(data_dict)
-        print("Requesting {}".format(data_json))
+        data_dict_formatted = data_dict.copy()
+        for key, value in data_dict_formatted.items():
+            try:
+                data_dict_formatted[key] = unserialize(value)
+            except:
+                pass
+        print("Requesting {}".format(data_dict_formatted))
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(
@@ -73,5 +80,11 @@ class RpcPub(object):
         )
         while self.response is None:
             self.connection.process_data_events()
-        print("Got {}".format(self.response))
+        response_formatted = self.response.copy()
+        for key, value in response_formatted.items():
+            try:
+                response_formatted[key] = unserialize(value)
+            except Exception:
+                pass
+        print("Got {}".format(response_formatted))
         return self.response

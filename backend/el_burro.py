@@ -9,7 +9,7 @@ from models import User, Product, Price, Tracked
 from walcart import Walcart
 import logging
 import time
-import rpc_pub from RpcPub
+from rpc_pub import RpcPub
 from common import serialize, unserialize
 
 from config import Database
@@ -35,11 +35,12 @@ class ElBurro(object):
         except Exception as e:
             self.logger.critical(str(e))
         for product in products:
+            time.sleep(self.delay)
             self.logger.info('Updating price for {}'.format(product.name))
             product_data = Walcart.product(product.id)
             current_price = product_data.get('salePrice')
             stock = product_data.get('stock')
-            old_price = None if not product.prices else product.prices[-1]
+            old_price = None if not product.prices else product.prices[-1].price
             self.logger.info('\tOld Price: {}\tCurrent Price: {}'.format(old_price, current_price))
             if old_price != current_price:
                 product.prices.append(Price(price=current_price, stock=stock))
@@ -50,7 +51,6 @@ class ElBurro(object):
             if not res.get('success'):
                 self.logger.critical(res['message'])
             self.logger.info('\t\tPrice has been updated successfully.')
-            time.sleep(self.delay)
 
 if __name__ == '__main__':
     running = True

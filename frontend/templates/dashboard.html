@@ -8,37 +8,25 @@
     <hr>
 
     
-    <table class="table table-striped">
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Date</th>
-            <th></th>
-            <th></th>
-        </tr>
-        
-        {% for product in products %}
-            <div class="card text-center">
-                <h5 class="card-header">{{ product.name }}</h5>
-                <img class="card-img-top" style="width: 18rem; margin:auto;" src="{{ product.med_img }}" alt="Card image cap">
+           
+        {% for track in products %}
+            <div class="card text-center col-lg-3">
+                <h5 class="card-header">{{ track.product.name }}</h5>
+                <img class="card-img-top" style="width: 9rem; margin:auto;" src="{{ track.product.med_img }}" alt="Card image cap">
                 <div class="card-body">
-                {% if product.prices %}
-                <h5 class="card-title">Current Price $.{{ product.prices[-1].price }}</h5>
+                {% if track.product.prices %}
+                <h5 class="card-title">Current Price $.{{ track.product.prices[-1].price }}</h5>
                 {% endif %}
-                <p class="card-text">{{ product.short_descr }}</p>
-                <form action="/add_product" method="post">
-                    <input type="text" value="{{ product.id }}" name="productID" id="productID">
-                    <input type="submit" value="Add to my List" class="btn btn-primary">
-                </form>
-                {% if product.prices %}
+                <p class="card-text">{{ track.product.short_descr }}</p>
+                
+                {% if track.product.prices %}
                 <div class="card-footer text-muted">
-                        {{ product.prices[-1].stock}}
+                        {{ track.product.prices[-1].stock}}
                     </div>
                 </div>
                 {% endif %}
             </div>
         {% endfor %}
-    </table>
+    
 
 {% endblock %}

@@ -33,7 +33,7 @@
                 {% endif %}
                 <p class="card-text">{{ product.short_descr }}</p>
                 <form action="/add_product" method="post">
-                    <input type="text" value="{{ product.id }}" name="productID" id="productID">
+                    <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
                     <input type="submit" value="Add to my List" class="btn btn-primary">
                 </form>
                 {% if product.prices %}

@@ -21,7 +21,9 @@ class BackendServ(object):
 		self.METHODS = {
 			"register": self.register,
 			"login": self.login,
-			"search": self.search
+			"search": self.search,
+			"track_product": self.track_product,
+			"get_user": self.get_user
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
@@ -48,7 +50,7 @@ class BackendServ(object):
 		user = unserialize(res['result'])
 		if user:
 			return {'hash': user.password}
-		self.logger.info('Invalid username: {}'.format(user.username))
+		self.logger.info('Invalid username')
 		return {'success': False, 'message': 'Invalid username'}
 
 	def search(self, product_id):
@@ -83,8 +85,34 @@ class BackendServ(object):
 			return {'product': unserialize(res['result']).to_dict()}
 		return {'product': product.to_dict()}
 
+	def track_product(self, vald):
+		username = vald['username']
+		product_id = vald['product_id']
+		try:
+			res = self.pub.call({'method': 'get', 'resource': 'user', 'where': {'username': username}})
+			user = unserialize(res['result'])
+			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_id}})
+			product = unserialize(res['result'])
+		except Exception as e:
+			return {'message': str(e)}
+		tracked = Tracked(wishlist=vald['wishlist'])
+		tracked.product = product
+		user.products.append(tracked)
+		res = self.pub.call({'method': 'save', 'resource': serialize(user)})
+		if not res.get('success'):
+			self.logger.info(res['message'])
+		return res
+
+	def get_user(self, username):
+		try:
+			res = self.pub.call({'method': 'get', 'resource': 'user', 'where': {'username': username}})
+			user = unserialize(res['result'])
+		except Exception as e:
+			return {'message': str(e)}
+		return {'success': True, 'user': user.to_dict()}
+
 if __name__ == '__main__':
 	backend = BackendServ()
 	burro = ElBurro()
-	threading.Thread(target=burro.start_updating).start()
+	#threading.Thread(target=burro.start_updating).start()
 	backend.sub.listen()

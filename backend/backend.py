@@ -5,7 +5,9 @@ from models import User, Product, Price, Tracked
 from rpc_sub import RpcSub
 from rpc_pub import RpcPub
 from walcart import Walcart
+from el_burro import ElBurro
 import logging
+import threading
 
 from config import Backend, Database
 from common import serialize, unserialize
@@ -19,10 +21,10 @@ class BackendServ(object):
 		self.METHODS = {
 			"register": self.register,
 			"login": self.login,
-            "search": self.search
+			"search": self.search
 		}
 		self.logger = logging.getLogger('backendserv')
-        self.logger.addHandler(logging.StreamHandler())
+		self.logger.addHandler(logging.StreamHandler())
 
 	def fill_request(self, request):
 		request_method = request.get("method", None)
@@ -83,4 +85,6 @@ class BackendServ(object):
 
 if __name__ == '__main__':
 	backend = BackendServ()
+	burro = ElBurro()
+	threading.Thread(target=burro.start_updating).start()
 	backend.sub.listen()

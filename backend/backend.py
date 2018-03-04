@@ -23,7 +23,8 @@ class BackendServ(object):
 			"login": self.login,
 			"search": self.search,
 			"track_product": self.track_product,
-			"get_user": self.get_user
+			"get_user": self.get_user,
+			"remove_product": self.remove_product
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
@@ -103,6 +104,23 @@ class BackendServ(object):
 			self.logger.info(res['message'])
 		return res
 
+	def remove_product(self, vald):
+		username = vald['username']
+		product_id = vald['product_id']
+		try:	
+			res = self.pub.call({'method': 'get', 'resource': 'user', 'where': {'username': username}})
+			user = unserialize(res['result'])
+		except Exception as e:
+			return {'message': str(e)}
+		for tracked in user.products:
+			if str(tracked.product.id) == product_id:
+				product_id = tracked.product.id
+				user_id = user.id
+				break
+		res = self.pub.call({'method': 'delete', 'resource': 'tracked', 'where': {'product_id': product_id, 'user_id': user_id}})
+		if not res.get('success'):
+			self.logger.info(res['message'])
+		return res
 	def get_user(self, username):
 		try:
 			res = self.pub.call({'method': 'get', 'resource': 'user', 'where': {'username': username}})
@@ -114,5 +132,5 @@ class BackendServ(object):
 if __name__ == '__main__':
 	backend = BackendServ()
 	burro = ElBurro()
-	#threading.Thread(target=burro.start_updating).start()
+	threading.Thread(target=burro.start_updating).start()
 	backend.sub.listen()

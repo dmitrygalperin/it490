@@ -16,11 +16,12 @@ logging.basicConfig(filename='/var/log/it490/database/dbserv.log',level=logging.
 CREATE = 'create'
 READ   = 'read'
 UPDATE = 'update'
-DELETE = 'delete'
+#DELETE = 'delete'
 
 #SQLAlchemy operation types
 GET = 'get'
 SAVE = 'save'
+DELETE = 'delete'
 
 class DbServ(object):
 
@@ -67,7 +68,7 @@ class DbServ(object):
             elif req_method == UPDATE:
                 stmt = tbl.update()
             elif req_method == DELETE:
-                stmt = tbl.delete()
+                return self.delete(Resource, where_clause)
             elif req_method == GET:
                 return self.get(Resource, where_clause)
             elif req_method == SAVE:
@@ -150,6 +151,10 @@ class DbServ(object):
             self.session.rollback()
             return {'message': str(e)}
 
+    def delete(self, resource, where_clause):
+        self.session.query(resource).filter_by(**where_clause).delete(synchronize_session='fetch')
+        self.session.commit()
+        return {'success': True}
 if __name__ == '__main__':
     dbserv = DbServ()
     if not dbserv.session:

@@ -8,7 +8,6 @@ from walcart import Walcart
 from el_burro import ElBurro
 import logging
 import threading
-from datetime import datetime, timedelta
 
 from config import Backend, Database
 from common import serialize, unserialize
@@ -25,8 +24,7 @@ class BackendServ(object):
 			"search": self.search,
 			"track_product": self.track_product,
 			"get_user": self.get_user,
-			"remove_product": self.remove_product,
-			"get_price_changes": self.get_price_changes
+			"remove_product": self.remove_product
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
@@ -35,7 +33,7 @@ class BackendServ(object):
 		request_method = request.get("method", None)
 		if request_method:
 			func = self.METHODS.get(request_method)
-			return func(request.get("data"))
+			return func(request["data"])
 		self.logger.info('Invalid request: {}'.format(request_method))
 		return {'success': False, 'message': 'Invalid request'}
 
@@ -142,17 +140,6 @@ class BackendServ(object):
 		if not res.get('success'):
 			self.logger.info(res['message'])
 		return res
-	
-	def get_price_changes(self, *args):
-		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {}})
-		products = unserialize(res['result'])
-		price_changed = []
-		minus_one_week = str(datetime.now() - timedelta(weeks=1))
-		for product in products:
-			if len(product.prices) > 1 and product.prices[-1].price and product.prices[-2].price:
-				if str(product.prices[-1].created_at) > minus_one_week:
-					price_changed.append(product)
-		return {'price_changed': [product.to_dict() for product in price_changed]}
 
 	def get_user(self, username):
 		try:

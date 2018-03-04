@@ -54,37 +54,56 @@ class BackendServ(object):
 		self.logger.info('Invalid username')
 		return {'success': False, 'message': 'Invalid username'}
 
+	def make_product(self, product_data):
+		product = Product(
+			id = product_data.get('itemId'),
+			upc = product_data.get('upc'),
+			name = product_data.get('name'),
+			thumbnail_img = product_data.get('thumbnailImage'),
+			med_img = product_data.get('mediumImage'),
+			lg_img = product_data.get('largeImage'),
+			short_descr = product_data.get('shortDescription'),
+			long_descr = product_data.get('longDescription'),
+			msrp = product_data.get('msrp'),
+			add_to_cart_url = product_data.get('addToCartUrl'),
+			url = product_data.get('productUrl'),
+		)
+		price = product_data.get('salePrice')
+		if price:
+			product.prices.append(Price(price=price, stock=product_data.get('stock')))
+		return product
+
+	def get_recommended_products(self, product_id):
+		recommended_products = Walcart.nbp(product_id)
+		try:
+			return [self.make_product(product_data) for product_data in recommended_products]
+		except:
+			return []
+	
 	def search(self, product_id):
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_id}})
 		product = unserialize(res['result'])
 		if not product:
-			print(product_id)
 			product_data = Walcart.product(product_id)
 			if product_data.get('message'):
 				return product_data
-			product = Product(
-				id = product_data.get('itemId'),
-				upc = product_data.get('upc'),
-				name = product_data.get('name'),
-				thumbnail_img = product_data.get('thumbnailImage'),
-				med_img = product_data.get('mediumImage'),
-				lg_img = product_data.get('largeImage'),
-				short_descr = product_data.get('shortDescription'),
-				long_descr = product_data.get('longDescription'),
-				msrp = product_data.get('msrp'),
-				add_to_cart_url = product_data.get('addToCartUrl'),
-				url = product_data.get('productUrl'),
-			)
-			price = product_data.get('salePrice')
-			if price:
-				product.prices.append(Price(price=price, stock=product_data.get('stock')))
+			product = self.make_product(product_data)
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
-			if not res.get('success'):
-				self.logger.info(res['message'])
-				return res
-			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_data.get('itemId')}})
-			return {'product': unserialize(res['result']).to_dict()}
-		return {'product': product.to_dict()}
+			product = unserialize(res['result'])
+		recommended_products = self.get_recommended_products(product.id)
+		for r_product in recommended_products:
+			res = self.pub.call({'method': 'save', 'resource': serialize(r_product)})
+			#if not res.get('success'):
+				#self.logger.info(res['message'])
+				#return res
+			#res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': r_product.id}})
+			#res_product = unserialize(res['result']).to_dict()
+		res_recommended_products = []
+		for recommended_product in recommended_products:
+			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': recommended_product.id}})
+			if unserialize(res['result']):
+				res_recommended_products.append(unserialize(res['result']).to_dict())
+		return {'product': product.to_dict(), 'recommended': res_recommended_products}
 
 	def track_product(self, vald):
 		username = vald['username']
@@ -107,7 +126,7 @@ class BackendServ(object):
 	def remove_product(self, vald):
 		username = vald['username']
 		product_id = vald['product_id']
-		try:	
+		try:
 			res = self.pub.call({'method': 'get', 'resource': 'user', 'where': {'username': username}})
 			user = unserialize(res['result'])
 		except Exception as e:
@@ -131,6 +150,6 @@ class BackendServ(object):
 
 if __name__ == '__main__':
 	backend = BackendServ()
-	burro = ElBurro()
-	threading.Thread(target=burro.start_updating).start()
+	#burro = ElBurro()
+	#threading.Thread(target=burro.start_updating).start()
 	backend.sub.listen()

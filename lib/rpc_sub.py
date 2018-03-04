@@ -67,11 +67,11 @@ class RpcSub(object):
             properties=pika.BasicProperties(correlation_id = props.correlation_id),
             body=json.dumps(response)
         )
-        for obj in [request, response]:
-            for key, value in obj.items():
-                try:
-                    obj[key] = unserialize(value)
-                except:
-                    pass
+        #for obj in [request, response]:
+        #    for key, value in obj.items():
+        #        try:
+        #            obj[key] = unserialize(value)
+        #        except:
+        #            pass
         self.logger.info('\t\tReceived: {}\n\t\tReturned: {}'.format(request, response))
         ch.basic_ack(delivery_tag = method.delivery_tag)

@@ -140,7 +140,15 @@ class DbServ(object):
 
     def save(self, resource):
         r_obj = unserialize(resource)
-        self.session.add(r_obj)
+        if type(r_obj) is list:
+            for obj in r_obj:
+                self.session.add(obj)
+                try:
+                    self.session.commit()
+                except:
+                    pass
+        else:
+            self.session.add(r_obj)
         try:
             self.session.commit()
             self.session.expunge_all()

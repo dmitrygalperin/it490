@@ -112,11 +112,12 @@ class BackendServ(object):
 			user = unserialize(res['result'])
 		except Exception as e:
 			return {'message': str(e)}
-		for i, tracked in enumerate(user.products):
+		for tracked in user.products:
 			if str(tracked.product.id) == product_id:
-				user.products.remove(user.products[i])
+				product_id = tracked.product.id
+				user_id = user.id
 				break
-		res = self.pub.call({'method': 'save', 'resource': serialize(user)})
+		res = self.pub.call({'method': 'delete', 'resource': 'tracked', 'where': {'product_id': product_id, 'user_id': user_id}})
 		if not res.get('success'):
 			self.logger.info(res['message'])
 		return res

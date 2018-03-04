@@ -1,6 +1,22 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+{% if recommended_products %}
+	<small>
+		<div class="card mt-3">
+			<div class="card-header">Recommended for you</div>
+			<div class="card-body">
+				<div class="card-group">
+					{% for product in recommended_products[:10] %}
+						{% include './includes/_product_card_mini.html' %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</small>
+{% endif %}
+
+
 <div class="card mt-3 mb-3 mr-auto ml-auto">
     <h5 class="card-header">{{ product.name }}</h5>
     <div class="w-75 ml-auto mr-auto text-center">

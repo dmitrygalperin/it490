@@ -1,0 +1,16 @@
+<div class="card" style="width: 6rem;">
+
+        <div class="w-75 ml-auto mr-auto">
+        <a href="/product/{{ product.id }}" target="blank">
+            <img class="card-img-top ml-auto mr-auto" src="{{ product.thumbnail_img }}" alt="Card image cap">
+        </a>
+        </div>
+
+    <div class="card-body text-center p-1">
+        <div class="font-italic">{{ product.name[:25].rstrip()+'...' }}</div>
+        {% if product.prices %}
+            {{ "${:,.2f}".format(product.prices[-1].price) }}
+        {% endif %}
+    </div>
+    
+</div>

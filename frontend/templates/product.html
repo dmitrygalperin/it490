@@ -1,10 +1,124 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>{{product.title}}</h1>
-    <small>{{product.name}}</small>
-    <hr>
-    <div>
-        
+<div class="card mt-3 mb-3 mr-auto ml-auto">
+    <h5 class="card-header">{{ product.name }}</h5>
+    <div class="w-75 ml-auto mr-auto text-center">
+        <a href="/product/{{ product.id }}" target="blank">
+            <img src="{{ product.lg_img }}" alt="Card image cap">
+        </a>
     </div>
+    <div class="card-body">         
+        <p class="card-text text-center">{{ product.short_descr }}</p>
+        <table class="mr-auto ml-auto mb-1 w-75">
+        	<tr>
+                <th>Tracked since</th>
+                <td>{{ product.created_at }}</td>
+            </tr>
+            {% if product.msrp %}
+                <tr>
+                    <th>MSRP</th>
+                    <td>{{ "${:,.2f}".format(product.msrp) }}</td>
+                </tr>
+            {% endif %}
+            {% if product.prices %}
+                <tr>
+                    <th>Current Price</th>
+                    <td>{{ "${:,.2f}".format(product.prices[-1].price) }}</td>
+                </tr>
+            {% endif %}
+          <tr>
+                <th>Stock Status</th>
+                <td>
+                    {% if product.prices[-1].stock == 'Available' %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {% else %}
+                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                    {{ product.prices[-1].stock }}
+                </td>
+            </tr>
+        </table>
+        {% if product.prices|length <= 1 %}
+            <p class="text-center mt-3 text-muted font-italic">No price history exists for this product</p>
+        {% else %}
+        	<canvas id="price-history" height="100" class="mb-3"></canvas>
+        {% endif %}
+       		
+        {% if session.logged_in and add_to_list %}
+            <form class="text-center" action="/add_product" method="post">
+                <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
+                <input type="submit" value="Add to my List" class="btn btn-success">
+            </form>
+        {% endif %}
+        <a class="card-link" href="{{ product.url }}" target="_blank">View on Walmart.com</a>
+        <a class="card-link float-right" href="{{ product.add_to_cart_url }}" target="_blank">Add to cart</a>
+    </div>
+    
+</div>
+
+<script>
+var ctx = document.getElementById("price-history").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    responsive: 'true',
+    data: {
+        labels : [{% for item in product.prices %}
+             "{{item.created_at}}",
+            {% endfor %}],
+		datasets : [{
+			  label: 'Price',
+			  fill: true,
+			  lineTension: 0.1,
+			  backgroundColor: "rgba(75,192,192,0.4)",
+			  borderColor: "rgba(75,192,192,1)",
+			  borderCapStyle: 'butt',
+			  borderDash: [],
+			  borderDashOffset: 0.0,
+			  borderJoinStyle: 'miter',
+			  pointBorderColor: "rgba(75,192,192,1)",
+			  pointBackgroundColor: "#fff",
+			  pointBorderWidth: 1,
+			  pointHoverRadius: 5,
+			  pointHoverBackgroundColor: "rgba(75,192,192,1)",
+			  pointHoverBorderColor: "rgba(220,220,220,1)",
+			  pointHoverBorderWidth: 2,
+			  pointRadius: 1,
+			  pointHitRadius: 10,
+			  data : [{% for item in product.prices %}
+			            {{item.price}},
+			          {% endfor %}],
+			  spanGaps: false
+		}],
+    },
+	options: {
+		tooltips: {
+          callbacks: {
+            label: function(toolTipItem, data) {
+              return toolTipItem.yLabel.toLocaleString("en-US",{style:"currency", currency:"USD"});
+            }
+          }
+        },
+	scales: {
+      xAxes: [{
+        ticks: {
+		    callback: function(value) { 
+		        return new Date(value).toLocaleString('en-US'); 
+		    },
+		},
+      }],
+      yAxes: [{
+        scaleLabel: {
+          display: false,
+        },
+        ticks: {
+          callback: function(value, index, values) {
+            return value.toLocaleString("en-US",{style:"currency", currency:"USD"}) ;
+          }
+        }
+      }]
+  	}
+ }
+});
+</script>
 {% endblock %}

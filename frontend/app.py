@@ -54,19 +54,6 @@ def index():
         return render_template('home.html', form=form, product=product)
             
     return render_template('home.html', form=form)
-
-@app.route('/products')
-def products():
-    
-    #request list of products from Rabit MQ
-    
-    result = "Test Product"
-    
-    #if result>0:
-    #    return render_template('products.html', articles=articles)
-    #else:
-    msg = 'Nothing Found'
-    return render_template('products.html', msg=result)
     
 
 @app.route('/product/<string:product_id>')
@@ -77,7 +64,8 @@ def product(product_id):
         logger.info(search_result['message'])
         flash(search_result['message'], 'danger')
     product = search_result.get('product')
-    return render_template('product.html', product=product)
+    recommended_products = search_result.get('recommended')
+    return render_template('product.html', product=product, recommended_products=recommended_products)
 
 
 '''

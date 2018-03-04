@@ -52,13 +52,13 @@ def index():
             flash(search_result['message'], 'danger')
         product = search_result.get('product')
         return render_template('home.html', form=form, product=product)
-            
-    return render_template('home.html', form=form)
+    res = pub.call({'method': 'get_price_changes'})
+    price_changed = res['price_changed']
+    return render_template('home.html', form=form, price_changed=price_changed)
     
 
 @app.route('/product/<string:product_id>')
 def product(product_id):
-    print(product_id)
     search_result = search_product('/{}'.format(product_id))
     if search_result.get('message'):
         logger.info(search_result['message'])
@@ -165,6 +165,7 @@ def dashboard():
     response = pub.call(data)
 
     if response['success']:
+        session['products'] = [tracked['product']['id'] for tracked in response['user']['products']]
         return render_template('dashboard.html', form=form, products=response['user']['products'], product=product)
     
 

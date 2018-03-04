@@ -18,4 +18,19 @@
         <div>{% include "./includes/_product_card.html" %}</div>
     {% endif %}
 
+    {% if price_changed %}
+        <div class="card ml-auto mr-auto">
+            <h5 class="card-header bg-dark text-white">Products with recent price changes</h5>
+            <div class="card-body">
+                <div class="card-columns">   
+                    {% for product in price_changed %}
+                        {% with add_to_list=false %}
+                            {% include "./includes/_product_card_med.html" %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}

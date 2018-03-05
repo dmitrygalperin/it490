@@ -91,20 +91,14 @@ class BackendServ(object):
 				return product_data
 			product = self.make_product(product_data)
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
-			product = unserialize(res['result'])
 		recommended_products = self.get_recommended_products(product.id)
-		#for r_product in recommended_products:
 		res = self.pub.call({'method': 'save', 'resource': serialize(recommended_products)})
-			#if not res.get('success'):
-				#self.logger.info(res['message'])
-				#return res
-			#res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': r_product.id}})
-			#res_product = unserialize(res['result']).to_dict()
 		res_recommended_products = []
-		for recommended_product in recommended_products:
-			res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': recommended_product.id}})
-			if unserialize(res['result']):
-				res_recommended_products.append(unserialize(res['result']).to_dict())
+		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': [p.id for p in recommended_products]}})
+		if unserialize(res['result']):
+			res_recommended_products = [p.to_dict() for p in unserialize(res['result'])]
+		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product.id}})
+		product = unserialize(res['result'])
 		return {'product': product.to_dict(), 'recommended': res_recommended_products}
 
 	def track_product(self, vald):
@@ -152,7 +146,7 @@ class BackendServ(object):
 			if len(product.prices) > 1 and product.prices[-1].price and product.prices[-2].price:
 				if str(product.prices[-1].created_at) > minus_one_week:
 					price_changed.append(product)
-		return {'price_changed': [product.to_dict() for product in price_changed]}
+		return {'price_changed': [product.to_dict() for product in price_changed], 'total_products': len(products)}
 
 	def get_user(self, username):
 		try:

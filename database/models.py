@@ -68,7 +68,7 @@ class User(Base, WalCommon):
 class Product(Base, WalCommon):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
-    upc = Column(String(200), nullable=False)
+    upc = Column(String(200))
     name = Column(String(200), nullable=False)
     thumbnail_img = Column(String(1000))
     med_img = Column(String(1000))

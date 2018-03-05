@@ -128,7 +128,12 @@ class DbServ(object):
 
     def get(self, resource, where_clause):
         response = []
-        result = self.session.query(resource).filter_by(**where_clause)
+        if where_clause and type(list(where_clause.values())[0]) is list:
+            col = list(where_clause.keys())[0]
+            values = list(where_clause.values())[0]
+            result = self.session.query(resource).filter(getattr(resource, col).in_(values)).all()
+        else:
+            result = self.session.query(resource).filter_by(**where_clause)
         #self.session.expunge_all()
         for item in result:
             response.append(item)

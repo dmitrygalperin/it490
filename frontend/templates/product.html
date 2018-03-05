@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-{% if recommended_products %}
+{% if recommended_products and recommended_products|length >= 5 %}
 	<small>
 		<div class="card mt-3">
 			<div class="card-header">Recommended for you</div>
@@ -18,14 +18,14 @@
 
 
 <div class="card mt-3 mb-3 mr-auto ml-auto">
-    <h5 class="card-header">{{ product.name }}</h5>
+    <h5 class="card-header text-white bg-dark">{{ product.name }}</h5>
     <div class="w-75 ml-auto mr-auto text-center">
         <a href="/product/{{ product.id }}" target="blank">
             <img src="{{ product.lg_img }}" alt="Card image cap">
         </a>
     </div>
     <div class="card-body">         
-        <p class="card-text text-center">{{ product.short_descr }}</p>
+        <p class="card-text text-center">{{ product.short_descr|striptags }}</p>
         <table class="mr-auto ml-auto mb-1 w-75">
         	<tr>
                 <th>Tracked since</th>
@@ -61,11 +61,13 @@
         	<canvas id="price-history" height="100" class="mb-3"></canvas>
         {% endif %}
        		
-        {% if session.logged_in and add_to_list %}
+        {% if session.logged_in and product.id not in session.products %}
             <form class="text-center" action="/add_product" method="post">
                 <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
                 <input type="submit" value="Add to my List" class="btn btn-success">
             </form>
+        {% else %}
+            <p class="text-muted text-center small">You are currently tracking this product</p>
         {% endif %}
         <a class="card-link" href="{{ product.url }}" target="_blank">View on Walmart.com</a>
         <a class="card-link float-right" href="{{ product.add_to_cart_url }}" target="_blank">Add to cart</a>

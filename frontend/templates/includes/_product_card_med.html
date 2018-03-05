@@ -1,23 +1,30 @@
 <div class="card mt-3 mb-3 mr-auto ml-auto">
-    <h5 class="card-header">{{ product.name }}</h5>
+    <h6 class="card-header">{{ product.name[:36] }}{% if product.name|length >= 36 %}...{% endif %}</h6>
     <div class="w-50 ml-auto mr-auto text-center">
         <a href="/product/{{ product.id }}">
             <img src="{{ product.med_img }}" alt="Card image cap">
         </a>
     </div>
     <div class="card-body">         
-        <p class="card-text text-center">{{ product.short_descr|striptags }}</p>
         <table class="mr-auto ml-auto mb-1 w-75">
-            {% if product.msrp %}
-                <tr>
-                    <th>MSRP</th>
-                    <td>{{ "${:,.2f}".format(product.msrp) }}</td>
-                </tr>
-            {% endif %}
             {% if product.prices %}
                 <tr>
+                    <th>Old Price</th>
+                    <td>{{ "${:,.2f}".format(product.prices[-2].price) }}</td>
+                </tr>
+                <tr>
                     <th>Current Price</th>
-                    <td>{{ "${:,.2f}".format(product.prices[-1].price) }}</td>
+                    {% if product.prices[-1].price < product.prices[-2].price %}
+                        <td class="text-success font-weight-bold">
+                            {{ "${:,.2f}".format(product.prices[-1].price) }}
+                            <i class="fa fa-chevron-circle-down" aria-hidden="true"></i>
+                        </td>
+                    {% else %}
+                        <td class="text-danger font-weight-bold">
+                            {{ "${:,.2f}".format(product.prices[-1].price) }}
+                            <i class="fa fa-chevron-circle-up" aria-hidden="true"></i>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endif %}
           <tr>
@@ -40,22 +47,16 @@
         {% if session.logged_in and product.id not in session.products %}
             <form class="text-center" action="/add_product" method="post">
                 <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
-                <input type="submit" value="Add to my List" class="btn btn-success">
+                <input type="submit" value="Add to list" class="btn btn-sm mb-1 btn-outline-success">
             </form>
+        {% else %}
+            <p class="text-muted text-center small">You are currently tracking this product</p>
         {% endif %}
         <a class="card-link" href="{{ product.url }}" target="_blank">Product page</a>
-        <a class="card-link" href="{{ product.add_to_cart_url }}" target="_blank">
+        <a class="card-link float-right" href="{{ product.add_to_cart_url }}" target="_blank">
             <i class="fa fa-shopping-cart" aria-hidden="true"></i>
             Add to cart
         </a>
-        {% if session.logged_in and product.id in session.products %}
-            <form class="float-right" action="/remove_product" method="post">
-                <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
-                <button type="submit" class="btn btn-link p-0">
-                    <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-                </button>
-            </form>
-        {% endif %}
     </div>
     
 </div>

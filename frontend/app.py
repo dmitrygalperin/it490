@@ -34,7 +34,7 @@ def search_product(url):
 
     data = {"method": "search", "data": productid[0][1:]}
     return pub.call(data)
-    
+
 
 #Home page Route. It gets an URL from the form in the home page
 #then stracts the ID at the end of the URL
@@ -54,9 +54,10 @@ def index():
         return render_template('home.html', form=form, product=product)
     res = pub.call({'method': 'get_price_changes'})
     price_changed = res['price_changed']
+    price_changed = [p for p in price_changed if p['prices'][-1]['price'] is not None and p['prices'][-2]['price'] is not None]
     total_products = res['total_products']
     return render_template('home.html', form=form, price_changed=price_changed, total_products=total_products)
-    
+
 
 @app.route('/product/<string:product_id>')
 def product(product_id):
@@ -73,7 +74,7 @@ def product(product_id):
 @app.route('/searchProduct', methods=['GET', 'POST'])
 def searchProduct():
     return render_template('product.html', form=form)
-'''  
+'''
 
 #Register from class
 class RegisterForm(Form):
@@ -97,15 +98,15 @@ def register():
         password = sha256_crypt.encrypt(str(form.password.data))
 
         data = {"method": "register", "data":{"email": email, "username": username, "password": password}}
-                
+
         response = pub.call(data)
         if response['success']:
             flash('You are now registered and can log in', 'success')
             return redirect(url_for('login'))
-        
+
     return render_template('register.html', form=form)
 
-#user login 
+#user login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -114,10 +115,10 @@ def login():
         password_candidate = request.form['password']
         app.logger.info(username)
 
-        data = {"method": "login", "data":{"username":username}} 
-        response = pub.call(data)  
-        
-        if response['hash']:
+        data = {"method": "login", "data":{"username":username}}
+        response = pub.call(data)
+
+        if 'hash' in response:
             if sha256_crypt.verify(password_candidate, response['hash']):
 
                 session['logged_in'] = True
@@ -126,14 +127,14 @@ def login():
                 flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                error = 'Wrong Credentials'
+                error = 'The password you entered does not match our records'
                 #logger send the error message to the log
                 logger.info(error)
-                return render_template('login.html', error=error)    
+                return render_template('login.html', error=error)
         else:
-            error = 'forgot something?'
-            return render_template('login.html', error=error)    
-            
+            error = 'Username {} does not exist'.format(username)
+            return render_template('login.html', error=error)
+
     return render_template('login.html')
 
 
@@ -168,21 +169,21 @@ def dashboard():
     if response['success']:
         session['products'] = [tracked['product']['id'] for tracked in response['user']['products']]
         return render_template('dashboard.html', form=form, products=response['user']['products'], product=product)
-    
+
 
 #Article from class
 
 class ArticleForm(Form):
     title = StringField('Title', [validators.Length(min=1, max=200)])
     body = StringField('Body', [validators.Length(min=30)])
-    
+
 @app.route('/add_product', methods=['POST'])
 @is_logged_in
 def add_product():
     if request.method == 'POST':
         user = session['username']
         result = request.form['productID']
-        data = {"method": "track_product", "data":{"username":user, "product_id": result, "wishlist":False}} 
+        data = {"method": "track_product", "data":{"username":user, "product_id": result, "wishlist":False}}
         response = pub.call(data)
 
         if response['success']:
@@ -197,7 +198,7 @@ def remove_product():
     if request.method == 'POST':
         user = session['username']
         result = request.form['productID']
-        data = {"method": "remove_product", "data":{"username":user, "product_id": result}} 
+        data = {"method": "remove_product", "data":{"username":user, "product_id": result}}
         response = pub.call(data)
 
         if response['success']:

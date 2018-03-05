@@ -8,9 +8,9 @@
 
     <div class="card-body text-center p-1">
         <div class="font-italic">{{ product.name[:25].rstrip()+'...' }}</div>
-        {% if product.prices %}
+        {% if product.prices and product.prices[-1].price %}
             {{ "${:,.2f}".format(product.prices[-1].price) }}
         {% endif %}
     </div>
-    
+
 </div>

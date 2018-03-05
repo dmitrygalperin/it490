@@ -5,9 +5,9 @@
             <img src="{{ product.med_img }}" alt="Card image cap">
         </a>
     </div>
-    <div class="card-body">         
+    <div class="card-body">
         <table class="mr-auto ml-auto mb-1 w-75">
-            {% if product.prices %}
+            {% if product.prices and product.prices[-1].price and product.prices[-2].price %}
                 <tr>
                     <th>Old Price</th>
                     <td>{{ "${:,.2f}".format(product.prices[-2].price) }}</td>
@@ -58,5 +58,5 @@
             Add to cart
         </a>
     </div>
-    
+
 </div>

@@ -5,7 +5,7 @@
             <img src="{{ product.med_img }}" alt="Card image cap">
         </a>
     </div>
-    <div class="card-body">         
+    <div class="card-body">
         <p class="card-text text-center">{{ product.short_descr|striptags }}</p>
         <table class="mr-auto ml-auto mb-1 w-75">
             {% if product.msrp %}
@@ -57,5 +57,5 @@
             </form>
         {% endif %}
     </div>
-    
+
 </div>

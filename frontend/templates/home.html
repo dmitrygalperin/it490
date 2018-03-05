@@ -5,11 +5,13 @@
     <div class="jumbotron">
         <h1 class="text-center">Welcome to Walcart!</h1>
         {% include "./includes/_product_search.html" %}
-        
+
         {% if session.logged_in == NULL %}
-        <p class="lead">Log in or Register to save an item in your list</p>
-            <a href="/register" class="btn btn-primary btn-lg">Register</a>
-            <a href="/login" class="btn btn-success btn-lg">Login</a>
+        <div class="text-center">
+          <p class="lead">Log in or Register to save an item in your list</p>
+              <a href="/register" class="btn btn-primary btn-lg">Register</a>
+              <a href="/login" class="btn btn-success btn-lg">Login</a>
+        </div>
         {% endif %}
     </div>
     {% if product %}
@@ -21,7 +23,7 @@
         <div class="card ml-auto mr-auto">
             <h5 class="card-header bg-dark text-white">Products with recent price changes</h5>
             <div class="card-body">
-                <div class="card-columns">   
+                <div class="card-columns">
                     {% for product in price_changed %}
                         {% with add_to_list=false %}
                             {% include "./includes/_product_card_med.html" %}

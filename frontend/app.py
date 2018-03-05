@@ -54,7 +54,8 @@ def index():
         return render_template('home.html', form=form, product=product)
     res = pub.call({'method': 'get_price_changes'})
     price_changed = res['price_changed']
-    return render_template('home.html', form=form, price_changed=price_changed)
+    total_products = res['total_products']
+    return render_template('home.html', form=form, price_changed=price_changed, total_products=total_products)
     
 
 @app.route('/product/<string:product_id>')

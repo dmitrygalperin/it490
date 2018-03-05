@@ -1,7 +1,7 @@
 <div class="card mt-3 mb-3 mr-auto ml-auto">
-    <h6 class="card-header">{{ product.name }}</h6>
+    <h6 class="card-header">{{ product.name[:36] }}{% if product.name|length >= 36 %}...{% endif %}</h6>
     <div class="w-50 ml-auto mr-auto text-center">
-        <a href="/product/{{ product.id }}" target="blank">
+        <a href="/product/{{ product.id }}">
             <img src="{{ product.med_img }}" alt="Card image cap">
         </a>
     </div>

@@ -22,6 +22,7 @@ UPDATE = 'update'
 GET = 'get'
 SAVE = 'save'
 DELETE = 'delete'
+SQL_SELECT_TO_ORM = 'sql_select_to_orm'
 
 class DbServ(object):
 
@@ -52,6 +53,7 @@ class DbServ(object):
         try:
             req_method = request.get('method').lower()
             req_resource = request.get('resource')
+            sql = request.get('sql')
             vald = request.get('values')
             where_clause = request.get('where')
             order_by = request.get('orderBy')
@@ -73,6 +75,8 @@ class DbServ(object):
                 return self.get(Resource, where_clause)
             elif req_method == SAVE:
                 return self.save(req_resource)
+            elif req_method == SQL_SELECT_TO_ORM:
+                return self.sql_select_to_orm(Resource, sql)
             else:
                 return {'message': "Invalid request type. Valid types are create, read, update, delete, get, save. e.g {method: 'create'}"}
 
@@ -168,6 +172,12 @@ class DbServ(object):
         self.session.query(resource).filter_by(**where_clause).delete(synchronize_session='fetch')
         self.session.commit()
         return {'success': True}
+
+    def sql_select_to_orm(self, resource, sql):
+        rows = self.session.execute(sql)
+        ids = [row[0] for row in rows]
+        return self.get(resource, {'id': ids})
+
 if __name__ == '__main__':
     dbserv = DbServ()
     if not dbserv.session:

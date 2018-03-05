@@ -138,6 +138,7 @@ class BackendServ(object):
 		return res
 	
 	def get_price_changes(self, *args):
+		'''
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {}})
 		products = unserialize(res['result'])
 		price_changed = []
@@ -147,6 +148,11 @@ class BackendServ(object):
 				if str(product.prices[-1].created_at) > minus_one_week:
 					price_changed.append(product)
 		return {'price_changed': [product.to_dict() for product in price_changed], 'total_products': len(products)}
+		'''
+		sql = 'select product_id from prices where yearweek(created_at) = yearweek(now()) group by product_id having count(*) > 1'
+		res = self.pub.call({'method': 'sql_select_to_orm', 'resource': 'product', 'sql': sql})
+		products = unserialize(res['result'])
+		return {'price_changed': [product.to_dict() for product in products], 'total_products': 1}
 
 	def get_user(self, username):
 		try:

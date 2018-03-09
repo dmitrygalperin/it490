@@ -18,6 +18,7 @@ class Api(object):
     base_url       = 'http://api.walmartlabs.com/v1'
     items_url      = '/items'
     nbp_url        = '/nbp'
+    paginated_url  = '/paginated/items'
     postbrowse_url = '/postbrowse'
 
 class RabbitMQ(object):

@@ -116,3 +116,12 @@ class Price(Base, WalCommon):
                 }
     def __repr__(self):
         return "<Price(product_id={}, price={})>".format(self.product_id, self.price)
+
+class Category(Base, WalCommon):
+    __tablename__ = 'categories'
+    id = Column(String(40), primary_key=True)
+    name = Column(String(200))
+    pages_parsed = Column(Integer)
+
+    def __repr__(self):
+        return '<Category(id={}, name={})>'.format(self.id, self.name)

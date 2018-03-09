@@ -30,7 +30,7 @@ class Walcart(object):
 
     @classmethod
     def search(cls, query):
-        url = '{}/{}?apiKey={}&query={}'.format(cls.base_url, cls.search_url, cls.key, query)
+        url = '{}{}?apiKey={}&query={}'.format(cls.base_url, cls.search_url, cls.key, query)
         return cls.get_json(url)
 
     @classmethod
@@ -40,4 +40,4 @@ class Walcart(object):
             return json.loads(urlopen(url).read().decode('utf-8'))
         except Exception as e:
             print(str(e))
-            return {'message': 'Could not find product. This may not be a problem with Walcart, but with Walmart product API'}
+            return {'message': 'Could not find product. This may not be a problem with Walcart, but with Walmart product API', 'error': str(e)}

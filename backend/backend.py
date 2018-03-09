@@ -23,6 +23,7 @@ class BackendServ(object):
 			"register": self.register,
 			"login": self.login,
 			"search": self.search,
+			"search_query": self.search_query,
 			"track_product": self.track_product,
 			"get_user": self.get_user,
 			"remove_product": self.remove_product,
@@ -85,6 +86,20 @@ class BackendServ(object):
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product.id}})
 		product = unserialize(res['result'])
 		return {'product': product.to_dict(), 'recommended': res_recommended_products}
+
+	def search_query(self, query):
+		result = Walcart.search(query)
+		if 'message' in result:
+			return {'success': False, 'message': result['message']}
+		else if 'items' in result:
+			products = [self.burro.make_product(product_data) for product_data in result['items']]
+			res = self.pub.call({'method': 'save', 'resource': serialize(products)})
+			if 'success' in res:
+				res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': [p.id for p in products]}})
+				return {'success': True, 'result': [p.to_dict() for p in unserialize(res['result'])]}
+			else:
+				return {'success': False}
+				
 
 	def track_product(self, vald):
 		username = vald['username']

@@ -11,6 +11,7 @@ class Walcart(object):
     nbp_url        = Api.nbp_url
     paginated_url  = Api.paginated_url
     postbrowse_url = Api.postbrowse_url
+    search_url     = Api.search_url
 
     @classmethod
     def product(cls, product_id):
@@ -25,6 +26,11 @@ class Walcart(object):
     @classmethod
     def paginated(cls, category_id):
         url = '{}{}?category={}&apiKey={}&format=json'.format(cls.base_url, cls.paginated_url, category_id, cls.key)
+        return cls.get_json(url)
+
+    @classmethod
+    def search(cls, query):
+        url = '{}/{}?apiKey={}&query={}'.format(cls.base_url, cls.search_url, cls.key, query)
         return cls.get_json(url)
 
     @classmethod

@@ -42,11 +42,11 @@ class BackendServ(object):
 	def register(self, user):
 		newUser = User(**user)
 		res = self.pub.call({'method': 'save', 'resource': serialize(newUser)})
-		if res['success']:
+		if 'success' in res:
 			return {'success': True, 'message': 'User has been registered successfully!' }
 		else:
 			self.logger.info(res['message'])
-			return res
+			return {'success': False, 'message': 'This user already exists.'}
 
 	def login(self, user):
 		res = self.pub.call({'method': 'get', 'resource': 'user', 'where': user})

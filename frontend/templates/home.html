@@ -14,10 +14,19 @@
         </div>
         {% endif %}
     </div>
-    {% if product %}
+    {% if product is iterable %}
+
+        {% for item in product %}
+            {% with product=item %}
+                {% include "./includes/_product_card.html" %}
+            {% endwith %}
+        {% endfor %}
+
+    {% elif product %}
         <div class="alert alert-success">Success! Here's what we've found</div>
         <div>{% include "./includes/_product_card.html" %}</div>
     {% endif %}
+
 
     {% if price_changed %}
         <div class="card ml-auto mr-auto">

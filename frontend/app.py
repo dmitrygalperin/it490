@@ -30,8 +30,10 @@ class SearchProductForm(Form):
 def search_product(url):
     productid = re.findall(r"[\/][0-9]{6,9}", url)
     if not productid:
-        return {'message': 'Invalid product URL. Please input a valid Walmart URL.'}
-
+        #return {'message': 'Invalid product URL. Please input a valid Walmart URL.'}
+        data = {"method": "search_query", "data": url}
+        return pub.call(data)
+        
     data = {"method": "search", "data": productid[0][1:]}
     return pub.call(data)
 
@@ -46,10 +48,11 @@ def index():
     if request.method == 'POST' and form.validate():
         search_result = search_product(form.product.data)
         
-        if search_result.get('message'):
+        if not search_result.get('success'):
             #if error getting product, then return error message to home page
             logger.info(search_result['message'])
             flash(search_result['message'], 'danger')
+            return render_template('home.html', form=form)
         product = search_result.get('product')
         return render_template('home.html', form=form, product=product)
     res = pub.call({'method': 'get_price_changes'})

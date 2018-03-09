@@ -4,7 +4,7 @@ sys.path.insert(0, "../lib")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from config import Database
-from models import User, Product, Tracked, Price
+from models import User, Product, Tracked, Price, Category
 import logging
 
 logging.basicConfig(filename='/var/log/it490/database/dbcon.log',level=logging.INFO, format='%(asctime)s %(message)s')
@@ -20,7 +20,8 @@ RESOURCES = {
     'user': User,
     'product': Product,
     'price': Price,
-    'tracked': Tracked
+    'tracked': Tracked,
+    'category': Category
 }
 
 

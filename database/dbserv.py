@@ -155,7 +155,7 @@ class DbServ(object):
                 try:
                     self.session.commit()
                 except:
-                    pass
+                    self.session.rollback()
         else:
             self.session.add(r_obj)
         try:

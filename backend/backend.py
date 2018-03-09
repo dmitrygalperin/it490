@@ -30,6 +30,9 @@ class BackendServ(object):
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
+		self.burro = ElBurro()
+
+		threading.Thread(target=burro.start(burro.update_prices)).start()
 
 	def fill_request(self, request):
 		request_method = request.get("method", None)
@@ -56,32 +59,14 @@ class BackendServ(object):
 		self.logger.info('Invalid username')
 		return {'success': False, 'message': 'Invalid username'}
 
-	def make_product(self, product_data):
-		product = Product(
-			id = product_data.get('itemId'),
-			upc = product_data.get('upc'),
-			name = product_data.get('name'),
-			thumbnail_img = product_data.get('thumbnailImage'),
-			med_img = product_data.get('mediumImage'),
-			lg_img = product_data.get('largeImage'),
-			short_descr = product_data.get('shortDescription'),
-			long_descr = product_data.get('longDescription'),
-			msrp = product_data.get('msrp'),
-			add_to_cart_url = product_data.get('addToCartUrl'),
-			url = product_data.get('productUrl'),
-		)
-		price = product_data.get('salePrice')
-		if price:
-			product.prices.append(Price(price=price, stock=product_data.get('stock')))
-		return product
 
 	def get_recommended_products(self, product_id):
 		recommended_products = Walcart.nbp(product_id)
 		try:
-			return [self.make_product(product_data) for product_data in recommended_products]
+			return [self.burro.make_product(product_data) for product_data in recommended_products]
 		except:
 			return []
-	
+
 	def search(self, product_id):
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': product_id}})
 		product = unserialize(res['result'])
@@ -89,7 +74,7 @@ class BackendServ(object):
 			product_data = Walcart.product(product_id)
 			if product_data.get('message'):
 				return product_data
-			product = self.make_product(product_data)
+			product = self.burro.make_product(product_data)
 			res = self.pub.call({'method': 'save', 'resource': serialize(product)})
 		recommended_products = self.get_recommended_products(product.id)
 		res = self.pub.call({'method': 'save', 'resource': serialize(recommended_products)})
@@ -136,7 +121,7 @@ class BackendServ(object):
 		if not res.get('success'):
 			self.logger.info(res['message'])
 		return res
-	
+
 	def get_price_changes(self, *args):
 		'''
 		res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {}})
@@ -164,6 +149,5 @@ class BackendServ(object):
 
 if __name__ == '__main__':
 	backend = BackendServ()
-	burro = ElBurro()
-	threading.Thread(target=burro.start_updating).start()
+	#threading.Thread(target=burro.start(burro.paginated)).start()
 	backend.sub.listen()

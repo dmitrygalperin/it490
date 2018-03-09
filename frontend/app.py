@@ -45,7 +45,7 @@ def index():
     #after a post methond from the page, get data from form
     if request.method == 'POST' and form.validate():
         search_result = search_product(form.product.data)
-        print(search_result.keys())
+        
         if search_result.get('message'):
             #if error getting product, then return error message to home page
             logger.info(search_result['message'])

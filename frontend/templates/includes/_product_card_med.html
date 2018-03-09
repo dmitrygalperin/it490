@@ -44,14 +44,19 @@
         {% else %}
             <p class="text-center mt-3 font-italic"><a href="/product/{{ product.id }}">View price history</a></p>
         {% endif %}
-        {% if session.logged_in and product.id not in session.products %}
-            <form class="text-center" action="/add_product" method="post">
-                <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
-                <input type="submit" value="Add to list" class="btn btn-sm mb-1 btn-outline-success">
-            </form>
+        {% if session.logged_in %}
+            {% if product.id not in session.products %}
+                <form class="text-center" action="/add_product" method="post">
+                    <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
+                    <input type="submit" value="Add to list" class="btn btn-sm mb-1 btn-outline-success">
+                </form>
+            {% else %}
+                <p class="text-muted text-center small">You are currently tracking this product</p>
+            {% endif %}
         {% else %}
-            <p class="text-muted text-center small">You are currently tracking this product</p>
+                <p class="text-muted text-center small"><a href="/register">Register</a> or <a href="/login">Login</a> to track this product</p>                
         {% endif %}
+
         <a class="card-link" href="{{ product.url }}" target="_blank">Product page</a>
         <a class="card-link float-right" href="{{ product.add_to_cart_url }}" target="_blank">
             <i class="fa fa-shopping-cart" aria-hidden="true"></i>

@@ -20,6 +20,7 @@ class Api(object):
     nbp_url        = '/nbp'
     paginated_url  = '/paginated/items'
     postbrowse_url = '/postbrowse'
+    search_url     = '/search'
 
 class RabbitMQ(object):
     username     = 'super'

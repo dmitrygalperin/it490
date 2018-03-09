@@ -23,6 +23,7 @@ class BackendServ(object):
 			"register": self.register,
 			"login": self.login,
 			"search": self.search,
+			"search_query": self.search_query,
 			"track_product": self.track_product,
 			"get_user": self.get_user,
 			"remove_product": self.remove_product,
@@ -32,7 +33,7 @@ class BackendServ(object):
 		self.logger.addHandler(logging.StreamHandler())
 		self.burro = ElBurro()
 
-		threading.Thread(target=burro.start(burro.update_prices)).start()
+		#threading.Thread(target=self.burro.start(self.burro.update_prices)).start()
 
 	def fill_request(self, request):
 		request_method = request.get("method", None)
@@ -86,6 +87,20 @@ class BackendServ(object):
 		product = unserialize(res['result'])
 		return {'product': product.to_dict(), 'recommended': res_recommended_products}
 
+	def search_query(self, query):
+		result = Walcart.search(query)
+		if 'message' in result:
+			return {'success': False, 'message': result['message']}
+		elif 'items' in result:
+			products = [self.burro.make_product(product_data) for product_data in result['items']]
+			res = self.pub.call({'method': 'save', 'resource': serialize(products)})
+			if 'success' in res:
+				res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': [p.id for p in products]}})
+				return {'success': True, 'product': [p.to_dict() for p in unserialize(res['result'])]}
+			else:
+				return {'success': False}
+				
+
 	def track_product(self, vald):
 		username = vald['username']
 		product_id = vald['product_id']
@@ -134,6 +149,7 @@ class BackendServ(object):
 					price_changed.append(product)
 		return {'price_changed': [product.to_dict() for product in price_changed], 'total_products': len(products)}
 		'''
+		self.logger.info('sdfsadf')
 		sql = 'select product_id from prices where yearweek(created_at) = yearweek(now()) group by product_id having count(*) > 1'
 		res = self.pub.call({'method': 'sql_select_to_orm', 'resource': 'product', 'sql': sql})
 		products = unserialize(res['result'])

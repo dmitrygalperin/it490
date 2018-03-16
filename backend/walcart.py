@@ -46,8 +46,4 @@ class Walcart(object):
             return json.loads(urlopen(url).read().decode('utf-8'))
         except Exception as e:
             print(str(e))
-<<<<<<< HEAD
             return {'message': 'Could not get result. This may not be a problem with Walcart, but with Walmart product API'}
-=======
-            return {'message': 'Could not find product. This may not be a problem with Walcart, but with Walmart product API', 'error': str(e)}
->>>>>>> df8265210e8851f2b3c198dd9068502b026cc1a9

@@ -27,7 +27,8 @@ class BackendServ(object):
 			"track_product": self.track_product,
 			"get_user": self.get_user,
 			"remove_product": self.remove_product,
-			"get_price_changes": self.get_price_changes
+			"get_price_changes": self.get_price_changes,
+            "get_stores": self.get_stores
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
@@ -99,7 +100,7 @@ class BackendServ(object):
 				return {'success': True, 'result': [p.to_dict() for p in unserialize(res['result'])]}
 			else:
 				return {'success': False}
-				
+
 
 	def track_product(self, vald):
 		username = vald['username']
@@ -161,6 +162,11 @@ class BackendServ(object):
 		except Exception as e:
 			return {'message': str(e)}
 		return {'success': True, 'user': user.to_dict()}
+
+    def get_stores(self, zipc):
+        stores = Walcart.get_stores(zipc)
+        return {'success': True, 'stores': stores}
+
 
 if __name__ == '__main__':
 	backend = BackendServ()

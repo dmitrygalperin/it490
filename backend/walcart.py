@@ -12,6 +12,7 @@ class Walcart(object):
     paginated_url  = Api.paginated_url
     postbrowse_url = Api.postbrowse_url
     search_url     = Api.search_url
+    stores_url     = Api.stores_url
 
     @classmethod
     def product(cls, product_id):
@@ -34,10 +35,15 @@ class Walcart(object):
         return cls.get_json(url)
 
     @classmethod
+    def get_stores(cls, zipc):
+        url = '{}{}?apiKey={}&zip={}&format=json'.format(cls.base_url, cls.stores_url, cls.key, zipc)
+        return cls.get_json(url)
+
+    @classmethod
     def get_json(cls, url):
         try:
             print(url)
             return json.loads(urlopen(url).read().decode('utf-8'))
         except Exception as e:
             print(str(e))
-            return {'message': 'Could not find product. This may not be a problem with Walcart, but with Walmart product API'}
+            return {'message': 'Could not get result. This may not be a problem with Walcart, but with Walmart product API'}

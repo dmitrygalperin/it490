@@ -21,6 +21,7 @@ class Api(object):
     paginated_url  = '/paginated/items'
     postbrowse_url = '/postbrowse'
     search_url     = '/search'
+    stores_url     = '/stores'
 
 class RabbitMQ(object):
     username     = 'super'

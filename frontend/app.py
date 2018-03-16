@@ -210,6 +210,20 @@ def remove_product():
             flash('There was an error tracking this product', 'error')
         return redirect('/dashboard')
 
+@app.route('/search_store', methods=['POST'])
+def search_store():
+    if request.method == 'POST':
+        for item, val, in request.form.items():
+            print(item, val)
+        zipcode = request.form['zipcode']
+        data = {"method":"get_stores", "data":zipcode}
+        response = pub.call(data)
+
+        if response['success']:
+            return render_template('stores.html', stores=response)
+        
+    
+
 
 if __name__ == '__main__':
     app.secret_key='secret123'

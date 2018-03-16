@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+
+
+<ul class="list-group list-group-flush">
+    {% for store in stores %}    
+    <li class="list-group-item">{{% store.name %}}</li>
+    {% endfor %}
+</ul>
+
+
+
+
+{% endblock %}

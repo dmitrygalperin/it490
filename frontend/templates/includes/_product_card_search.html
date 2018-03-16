@@ -1,0 +1,48 @@
+<div class="card mt-3 mb-3 mr-auto ml-auto">
+    <h5 class="card-header">{{ product.name }}</h5>
+    <div class="w-50 ml-auto mr-auto text-center">
+        <a href="/product/{{ product.id }}">
+            <img src="{{ product.med_img }}" alt="Card image cap">
+        </a>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-center">{{ product.short_descr|striptags }}</p>
+        
+        <table class="mr-auto ml-auto mb-1 w-75 text-center">
+            {% if product.msrp %}
+                <tr>
+                    <th>MSRP</th>
+                    <td>{{ "${:,.2f}".format(product.msrp) }}</td>
+                </tr>
+            {% endif %}
+        
+            <tr>
+                <th>Current Price</th>
+                {% if product.prices|length  %}
+                    <td class="text-success font-weight-bold">
+                        {{ "${:,.2f}".format(product.prices[-1].price) }}
+                        
+                    </td>
+                
+                {% endif %}
+            </tr>
+        
+        </table>
+
+        
+        
+        {% if session.logged_in and product.id not in session.products %}
+            <form class="text-center" action="/add_product" method="post">
+                <input type="text" value="{{ product.id }}" name="productID" id="productID" hidden>
+                <input type="submit" value="Add to my List" class="btn btn-success">
+            </form>
+        {% endif %}
+        <a class="card-link" href="{{ product.url }}" target="_blank">Product page</a>
+        <a class="card-link" href="{{ product.add_to_cart_url }}" target="_blank">
+            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+            Add to cart
+        </a>
+        
+    </div>
+
+</div>

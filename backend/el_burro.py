@@ -19,15 +19,15 @@ logging.basicConfig(filename='/var/log/it490/backend/el_burro.log',level=logging
 class ElBurro(object):
     def __init__(self):
         self.threads = 0
-        self.delay = 20 #delay (s) between API requests
+        self.delay = 40 #delay (s) between API requests
         self.pub = RpcPub(Database.queue)
         self.logger = logging.getLogger('elburro')
         self.logger.addHandler(logging.StreamHandler())
         self.running = True
 
     def start(self, method_to_start):
-        time.sleep(self.threads * (self.delay//2))
         self.threads += 1
+        time.sleep(self.threads * (self.delay//2))
         while self.running:
             method_to_start()
 

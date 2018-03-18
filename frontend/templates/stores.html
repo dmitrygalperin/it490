@@ -1,17 +1,47 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+    {% if stores %}
+    <h3>Walmarts near {{zipcode}}:</h3>
+    <ul class="list-group list-group-flush">
+        {% for store in stores %}
+            <li class="list-group-item">
+		<div class="row">
+		    <div class="col-md-6">
+                        <h6>{{store.name}}</h6>
+                        <p class="text-muted">{{store.streetAddress}}, {{store.city}} {{store.zip}}</p>
+			<p class="text-muted">{{store.phoneNumber}}</p>
+                    </div>
+		    <div class="col-md-6">
+		        <div style="height: 300px; width: 300px;" id="map-{{store.no}}"></div>
+		    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <script>
+        function initMaps() {
+	    {% for store in stores %}
+	        initMap({{store.no}}, {{store.coordinates}})
+	    {% endfor %}
+	}
 
-
-
-
-<ul class="list-group list-group-flush">
-    {% for store in stores %}    
-    <li class="list-group-item">{{% store.name %}}</li>
-    {% endfor %}
-</ul>
-
-
-
-
+	function initMap(storeNo, coordinates) {
+	    var coords = {lat: coordinates[1], lng: coordinates[0]}
+	    var map = new google.maps.Map(document.getElementById('map-'.concat(storeNo)), {
+	        zoom: 14,
+		center: coords
+	    });
+	    var marker = new google.maps.Marker({
+	        position: coords,
+		map: map
+	    });
+	}
+    </script>
+    <script async defer 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSf4Yy5xzbDikm5_tvA4kdNlMA-qs-UDI&callback=initMaps">
+    </script>
+    {% else %}
+     <h3>Could not find any Walmart stores in that location</h3>
+    {% endif %}
 {% endblock %}

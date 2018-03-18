@@ -218,9 +218,13 @@ def search_store():
         zipcode = request.form['zipcode']
         data = {"method":"get_stores", "data":zipcode}
         response = pub.call(data)
-
+        stores = response['stores']
+        if type(stores) is list:
+            stores = [store for i, store in enumerate(response['stores']) if i < 8]
+        else:
+            stores = None
         if response['success']:
-            return render_template('stores.html', stores=response)
+            return render_template('stores.html', stores=stores, zipcode=zipcode)
         
     
 

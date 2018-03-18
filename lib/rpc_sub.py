@@ -8,6 +8,7 @@ import logging
 import json
 from json import JSONDecodeError
 from common import unserialize
+import reprlib
 
 logging.basicConfig(filename='/var/log/it490/rpc/rpc_sub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -73,5 +74,5 @@ class RpcSub(object):
         #            obj[key] = unserialize(value)
         #        except:
         #            pass
-        self.logger.info('\t\tReceived: {}\n\t\tReturned: {}'.format(request, response))
+        self.logger.info('\t\tReceived: {}\n\t\tReturned: {}'.format(reprlib.repr(request), reprlib.repr(response)))
         ch.basic_ack(delivery_tag = method.delivery_tag)

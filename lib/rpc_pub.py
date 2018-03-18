@@ -10,6 +10,7 @@ import logging
 import threading
 import time
 from common import unserialize
+import reprlib
 
 logging.basicConfig(filename='/var/log/it490/rpc/rpc_pub.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -65,7 +66,7 @@ class RpcPub(object):
                 data_dict_formatted[key] = unserialize(value)
             except:
                 pass
-        print("Requesting {}".format(data_dict_formatted))
+        print("Requesting {}".format(reprlib.repr(data_dict_formatted)))
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(
@@ -86,5 +87,5 @@ class RpcPub(object):
                 response_formatted[key] = unserialize(value)
             except Exception:
                 pass
-        print("Got {}".format(response_formatted))
+        print("Got {}".format(reprlib.repr(response_formatted)))
         return self.response

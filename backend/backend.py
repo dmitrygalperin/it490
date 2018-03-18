@@ -33,8 +33,8 @@ class BackendServ(object):
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
 		self.burro = ElBurro()
+		threading.Thread(target=self.burro.start, args=(self.burro.update_prices,)).start()
 
-		#threading.Thread(target=self.burro.start(self.burro.update_prices)).start()
 
 	def fill_request(self, request):
 		request_method = request.get("method", None)
@@ -150,11 +150,10 @@ class BackendServ(object):
 					price_changed.append(product)
 		return {'price_changed': [product.to_dict() for product in price_changed], 'total_products': len(products)}
 		'''
-		self.logger.info('sdfsadf')
-		sql = 'select product_id from prices where yearweek(created_at) = yearweek(now()) group by product_id having count(*) > 1'
+		sql = "select product_id from prices where month(created_at) = month(now()) and stock = 'Available' group by product_id having count(*) > 1"
 		res = self.pub.call({'method': 'sql_select_to_orm', 'resource': 'product', 'sql': sql})
 		products = unserialize(res['result'])
-		return {'price_changed': [product.to_dict() for product in products], 'total_products': 1}
+		return {'price_changed': [product.to_dict() for product in products if product.prices[-1].price and product.prices[-2].price and product.prices[-1].price < product.prices[-2].price], 'total_products': 11111111111}
 
 	def get_user(self, username):
 		try:
@@ -164,12 +163,14 @@ class BackendServ(object):
 			return {'message': str(e)}
 		return {'success': True, 'user': user.to_dict()}
 
-    def get_stores(self, zipc):
-        stores = Walcart.get_stores(zipc)
-        return {'success': True, 'stores': stores}
+	def get_stores(self, zipc):
+		stores = Walcart.get_stores(zipc)
+		return {'success': True, 'stores': stores}
 
 
 if __name__ == '__main__':
 	backend = BackendServ()
+	#burro = ElBurro()
+	#threading.Thread(targe=burro.update_prices).start()
 	#threading.Thread(target=burro.start(burro.paginated)).start()
 	backend.sub.listen()

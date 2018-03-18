@@ -16,7 +16,7 @@
         </div>
         {% endif %}
     </div>
-    {% if product is iterable %}
+    {% if product and product is iterable %}
     <div class="card ml-auto mr-auto">
         <h5 class="card-header bg-dark text-white">Here's what we've found</h5>
         <div class="card-body">

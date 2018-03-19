@@ -89,7 +89,7 @@ class BackendServ(object):
 		return {'product': product.to_dict(), 'recommended': res_recommended_products}
 
 	def search_query(self, query):
-		result = Walcart.search(query)
+		result = Walcart.search(query.replace(' ', '%20'))
 		if 'message' in result:
 			return {'success': False, 'message': result['message']}
 		elif 'items' in result:
@@ -97,7 +97,9 @@ class BackendServ(object):
 			res = self.pub.call({'method': 'save', 'resource': serialize(products)})
 			if 'success' in res:
 				res = self.pub.call({'method': 'get', 'resource': 'product', 'where': {'id': [p.id for p in products]}})
-				return {'success': True, 'product': [p.to_dict() for p in unserialize(res['result'])]}
+				data = unserialize(res['result'])
+				product = [p.to_dict() for p in data] if type(data) == list else data.to_dict()
+				return {'success': True, 'product': product}
 			else:
 				return {'success': False}
 
@@ -153,7 +155,7 @@ class BackendServ(object):
 		sql = "select product_id from prices where month(created_at) = month(now()) and stock = 'Available' group by product_id having count(*) > 1"
 		res = self.pub.call({'method': 'sql_select_to_orm', 'resource': 'product', 'sql': sql})
 		products = unserialize(res['result'])
-		return {'price_changed': [product.to_dict() for product in products if product.prices[-1].price and product.prices[-2].price and product.prices[-1].price < product.prices[-2].price], 'total_products': 11111111111}
+		return {'price_changed': [product.to_dict() for product in products if product.prices[-1].price and product.prices[-2].price and product.prices[-1].price < product.prices[-2].price]}
 
 	def get_user(self, username):
 		try:

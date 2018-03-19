@@ -22,9 +22,9 @@ logger.addHandler(plogging.StreamHandler())
 
 class SearchProductForm(Form):
     product = StringField(
-        'Enter a Walmart product URL to begin tracking',
+        'Find products',
         [validators.Length(min=4)],
-        render_kw={"placeholder": "https://www.walmart.com/ip/Microsoft-Xbox-One-S-1TB-PLAYERUNKNOWN-S-BATTLEGROUNDS-Bundle-White-234-00301/488609639"}
+        render_kw={"placeholder": "Enter a search term or Walmart product URL"}
     )
 
 def search_product(url):
@@ -47,19 +47,18 @@ def index():
     #after a post methond from the page, get data from form
     if request.method == 'POST' and form.validate():
         search_result = search_product(form.product.data)
-        
-        if not search_result.get('success'):
-            #if error getting product, then return error message to home page
-            logger.info(search_result['message'])
-            flash(search_result['message'], 'danger')
-            return render_template('home.html', form=form)
         product = search_result.get('product')
-        return render_template('home.html', form=form, product=product)
+        if not product:
+            flash('Your search returned no results.', 'danger')
+            return render_template('home.html', form=form)
+        if type(product) == list:
+            return render_template('home.html', form=form, products=product)
+        else:
+            return render_template('home.html', form=form, product=product)
     res = pub.call({'method': 'get_price_changes'})
     price_changed = res['price_changed']
     price_changed = [p for p in price_changed if p['prices'][-1]['price'] is not None and p['prices'][-2]['price'] is not None]
-    total_products = res['total_products']
-    return render_template('home.html', form=form, price_changed=price_changed, total_products=total_products)
+    return render_template('home.html', form=form, price_changed=price_changed)
 
 
 @app.route('/product/<string:product_id>')
@@ -106,8 +105,10 @@ def register():
         if response['success']:
             flash('You are now registered and can log in', 'success')
             return redirect(url_for('login'))
-
-    return render_template('register.html', form=form)
+    if 'username' in session:
+        return redirect('/dashboard')
+    else:
+        return render_template('register.html', form=form)
 
 #user login
 @app.route('/login', methods=['GET', 'POST'])
@@ -138,7 +139,10 @@ def login():
             error = 'Username {} does not exist'.format(username)
             return render_template('login.html', error=error)
 
-    return render_template('login.html')
+    if 'username' in session:
+        return redirect('/dashboard')
+    else:
+        return render_template('login.html')
 
 
 

@@ -3,8 +3,8 @@ El Burro is a daemon process that constantly updates the prices of all products
 in the database.
 '''
 import	sys
-sys.path.insert(0, "../lib")
-sys.path.insert(0, "../database")
+sys.path.insert(0, "/home/produ/it490/lib")
+sys.path.insert(0, "/home/produ/it490/database")
 from models import User, Product, Price, Tracked, Category
 from walcart import Walcart
 import logging

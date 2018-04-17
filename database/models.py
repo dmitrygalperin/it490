@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "../lib")
+sys.path.insert(0, "/home/produ/it490/lib")
 from sqlalchemy import Column, Integer, Float, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base

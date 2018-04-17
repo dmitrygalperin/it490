@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "../lib")
+sys.path.insert(0, "/home/produ/it490/lib")
 from config import Api
 import json
 from urllib.request import urlopen

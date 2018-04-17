@@ -1,6 +1,6 @@
 import	sys
-sys.path.insert(0, "../lib")
-sys.path.insert(0, "../database")
+sys.path.insert(0, "/home/produ/it490/lib")
+sys.path.insert(0, "/home/produ/it490/database")
 from models import User, Product, Price, Tracked
 from rpc_sub import RpcSub
 from rpc_pub import RpcPub

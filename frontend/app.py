@@ -2,11 +2,10 @@ import sys
 import re
 import json
 #import logging
-sys.path.append("../lib")
+sys.path.append("/home/produ/it490/lib")
 from rpc_pub import RpcPub
 import logging as plogging
 from flask import Flask, render_template, flash, redirect, url_for, logging, session, request, jsonify, Markup
-from data import Articles
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from config import Backend
@@ -33,7 +32,7 @@ def search_product(url):
         #return {'message': 'Invalid product URL. Please input a valid Walmart URL.'}
         data = {"method": "search_query", "data": url}
         return pub.call(data)
-        
+
     data = {"method": "search", "data": productid[0][1:]}
     return pub.call(data)
 
@@ -229,8 +228,8 @@ def search_store():
             stores = None
         if response['success']:
             return render_template('stores.html', stores=stores, zipcode=zipcode)
-        
-    
+
+
 
 
 if __name__ == '__main__':

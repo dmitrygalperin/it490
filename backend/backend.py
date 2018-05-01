@@ -173,15 +173,15 @@ class BackendServ(object):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('mode')
-    args = parser.parse_args()
-    if(args.mode == 'staging'):
-        queue_suffix = '_staging'
-    elif(args.mode == 'prod'):
-        queue_suffix = '_prod'
-    else:
-        queue_suffix = '_dev'
+	parser = argparse.ArgumentParser()
+	parser.add_argument('mode')
+	args = parser.parse_args()
+	if(args.mode == 'staging'):
+		queue_suffix = '_staging'
+	elif(args.mode == 'prod'):
+		queue_suffix = '_prod'
+	else:
+		queue_suffix = '_dev'
 	backend = BackendServ(queue_suffix)
 	#burro = ElBurro(queue_suffix)
 	#threading.Thread(targe=burro.update_prices).start()

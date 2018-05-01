@@ -113,7 +113,7 @@ class ElBurro(object):
 
 if __name__ == '__main__':
     running = True
-    parser = arpgarse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument('mode')
     args = parser.parse_args()
     if(args.mode == 'staging'):

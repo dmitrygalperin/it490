@@ -173,7 +173,7 @@ class BackendServ(object):
 
 
 if __name__ == '__main__':
-    parser = arpgarse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument('mode')
     args = parser.parse_args()
     if(args.mode == 'staging'):

@@ -1,7 +1,6 @@
 import sys
 import re
 import json
-#import logging
 sys.path.append("/home/produ/it490/lib")
 from rpc_pub import RpcPub
 import logging as plogging
@@ -10,10 +9,12 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 from config import Backend
 from utils import is_logged_in
+import argparse
 
 app = Flask(__name__)
 
-pub = RpcPub(Backend.queue)
+global pub
+
 plogging.basicConfig(filename='/var/log/it490/frontend/frontend.log',level=plogging.INFO, format='%(asctime)s %(message)s')
 logger = plogging.getLogger('frontend')
 logger.addHandler(plogging.StreamHandler())
@@ -234,4 +235,14 @@ def search_store():
 
 if __name__ == '__main__':
     app.secret_key='secret123'
+    parser = arpgarse.ArgumentParser()
+    parser.add_argument('mode')
+    args = parser.parse_args()
+    if(args.mode == 'staging'):
+        queue_suffix = '_staging'
+    elif(args.mode == 'prod'):
+        queue_suffix = '_prod'
+    else:
+        queue_suffix = '_dev'
+    pub = RpcPub(Backend.queue + queue_suffix)
     app.run(host='0.0.0.0', port=5000, debug=True)

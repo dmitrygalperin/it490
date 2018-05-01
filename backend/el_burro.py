@@ -11,16 +11,17 @@ import logging
 import time
 from rpc_pub import RpcPub
 from common import serialize, unserialize
+import argparse
 
 from config import Database
 
 logging.basicConfig(filename='/var/log/it490/backend/el_burro.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 class ElBurro(object):
-    def __init__(self):
+    def __init__(self, queue_suffix):
         self.threads = 0
         self.delay = 40 #delay (s) between API requests
-        self.pub = RpcPub(Database.queue)
+        self.pub = RpcPub(Database.queue + queue_suffix)
         self.logger = logging.getLogger('elburro')
         self.logger.addHandler(logging.StreamHandler())
         self.running = True
@@ -112,5 +113,14 @@ class ElBurro(object):
 
 if __name__ == '__main__':
     running = True
-    burro = ElBurro()
+    parser = arpgarse.ArgumentParser()
+    parser.add_argument('mode')
+    args = parser.parse_args()
+    if(args.mode == 'staging'):
+        queue_suffix = '_staging'
+    elif(args.mode == 'prod'):
+        queue_suffix = '_prod'
+    else:
+        queue_suffix = '_dev'
+    burro = ElBurro(queue_suffix)
     burro.start_updating()

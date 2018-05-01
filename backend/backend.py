@@ -33,7 +33,7 @@ class BackendServ(object):
 		}
 		self.logger = logging.getLogger('backendserv')
 		self.logger.addHandler(logging.StreamHandler())
-		self.burro = ElBurro()
+		self.burro = ElBurro(queue_suffix)
 		threading.Thread(target=self.burro.start, args=(self.burro.update_prices,)).start()
 
 

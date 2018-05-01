@@ -9,6 +9,7 @@ from el_burro import ElBurro
 import logging
 import threading
 from datetime import datetime, timedelta
+import argparse
 
 from config import Backend, Database
 from common import serialize, unserialize
@@ -16,9 +17,9 @@ from common import serialize, unserialize
 logging.basicConfig(filename='/var/log/it490/backend/backendserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
 class BackendServ(object):
-	def __init__(self):
-		self.pub = RpcPub(Database.queue)
-		self.sub = RpcSub(Backend.queue, self.fill_request)
+	def __init__(self, queue_suffix):
+		self.pub = RpcPub(Database.queue + queue_suffix)
+		self.sub = RpcSub(Backend.queue + queue_suffix, self.fill_request)
 		self.METHODS = {
 			"register": self.register,
 			"login": self.login,
@@ -172,8 +173,17 @@ class BackendServ(object):
 
 
 if __name__ == '__main__':
-	backend = BackendServ()
-	#burro = ElBurro()
+    parser = arpgarse.ArgumentParser()
+    parser.add_argument('mode')
+    args = parser.parse_args()
+    if(args.mode == 'staging'):
+        queue_suffix = '_staging'
+    elif(args.mode == 'prod'):
+        queue_suffix = '_prod'
+    else:
+        queue_suffix = '_dev'
+	backend = BackendServ(queue_suffix)
+	#burro = ElBurro(queue_suffix)
 	#threading.Thread(targe=burro.update_prices).start()
 	#threading.Thread(target=burro.start(burro.paginated)).start()
 	backend.sub.listen()

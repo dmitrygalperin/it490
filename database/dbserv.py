@@ -9,6 +9,7 @@ from dbcon import Dbcon
 from common import serialize, unserialize
 import logging
 from sqlalchemy.orm import joinedload_all
+import argparse
 
 logging.basicConfig(filename='/var/log/it490/database/dbserv.log',level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -179,8 +180,17 @@ class DbServ(object):
         return self.get(resource, {'id': ids})
 
 if __name__ == '__main__':
+    parser = arpgarse.ArgumentParser()
+    parser.add_argument('mode')
+    args = parser.parse_args()
+    if(args.mode == 'staging'):
+        queue_suffix = '_staging'
+    elif(args.mode == 'prod'):
+        queue_suffix = '_prod'
+    else:
+        queue_suffix = '_dev'
     dbserv = DbServ()
     if not dbserv.session:
         sys.exit()
-    rpc_sub = RpcSub(Database.queue, dbserv.fill_request)
+    rpc_sub = RpcSub(Database.queue + queue_suffix, dbserv.fill_request)
     rpc_sub.listen()

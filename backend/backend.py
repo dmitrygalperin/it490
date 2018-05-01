@@ -155,6 +155,7 @@ class BackendServ(object):
 		sql = "select product_id from prices where month(created_at) = month(now()) and stock = 'Available' group by product_id having count(*) > 1"
 		res = self.pub.call({'method': 'sql_select_to_orm', 'resource': 'product', 'sql': sql})
 		products = unserialize(res['result'])
+		products = [products] if type(products) != list else products
 		return {'price_changed': [product.to_dict() for product in products if product.prices[-1].price and product.prices[-2].price and product.prices[-1].price < product.prices[-2].price]}
 
 	def get_user(self, username):
